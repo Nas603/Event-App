@@ -1,5 +1,6 @@
 import React from 'react';
 import '../assets/styles/HomePage.css';
+import { Link } from 'react-router-dom';
 
 const HomePage = () => {
   return (
@@ -7,7 +8,9 @@ const HomePage = () => {
       <section className="hero">
         <h1>Welcome to Event Planner</h1>
         <p>Plan, manage, and enjoy your events effortlessly.</p>
+        <Link to="EventsPage">
         <button className="cta-button">Explore Events</button>
+        </Link>
       </section>
 
       <section className="features">
