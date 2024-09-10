@@ -1,16 +1,32 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import '../assets/styles/HomePage.css';
+import { Link, useLocation } from 'react-router-dom';
+import '../assets/styles/Header.css';
 
 const Header = () => {
+  const location = useLocation();
+  const path = location.pathname;
+
   return (
-    <header className="header">
-      <nav>
+    <header className="header-container">
+      <div className="logo">
+        <Link to="/">
+          <h1>Event Planner</h1>
+        </Link>
+      </div>
+      <nav className="nav-menu">
         <ul>
-          <li><Link to="/">Home</Link></li>
-          <li><Link to="/events">Events</Link></li>
-          <li><Link to="/profile">Profile</Link></li>
-          <li><Link to="/login">Login</Link></li>
+          <li className={path === '/' ? 'active' : ''}>
+            <Link to="/">Home</Link>
+          </li>
+          <li className={path === '/events' ? 'active' : ''}>
+            <Link to="/events">Events</Link>
+          </li>
+          <li className={path === '/profile' ? 'active' : ''}>
+            <Link to="/profile">Profile</Link>
+          </li>
+          <li className={path === '/login' ? 'active' : ''}>
+            <Link to="/login">Login</Link>
+          </li>
         </ul>
       </nav>
     </header>

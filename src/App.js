@@ -10,6 +10,10 @@ import ReportsPage from './pages/ReportsPage';
 import UserProfilePage from './pages/UserProfilePage';
 import LoginPage from './pages/LoginPage';
 import SignUpPage from './pages/SignUpPage';
+import AboutPage from './pages/AboutPage';
+import ContactPage from './pages/ContactPage';
+import TermsPage from './pages/TermsPage';
+import PrivacyPage from './pages/PrivacyPage';
 import Header from './components/Header';
 import Footer from './components/Footer';
 
@@ -28,6 +32,10 @@ const App = () => {
         <Route path="/profile" element={<UserProfilePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/about" element={<AboutPage />} /> 
+        <Route path="/contact" element={<ContactPage />} /> 
+        <Route path="/terms" element={<TermsPage />} /> 
+        <Route path="/privacy" element={<PrivacyPage />} /> 
       </Routes>
       <Footer />
     </>
