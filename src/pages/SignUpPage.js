@@ -1,10 +1,13 @@
 import React from 'react';
+import SignUpForm from '../components/SignUpForm';
+import '../assets/styles/SignUpPage.css';
 
 const SignUpPage = () => {
   return (
-    <div>
+    <div className="signup-page">
       <h1>Sign Up</h1>
-      <p>Register to create an account.</p>
+      <p>Fill in the details to create an account.</p>
+      <SignUpForm />
     </div>
   );
 };

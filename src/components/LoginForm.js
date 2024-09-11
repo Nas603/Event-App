@@ -1,40 +1,38 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useAuth0 } from '@auth0/auth0-react';
 import '../assets/styles/LoginForm.css';
 
 const LoginForm = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const { loginWithRedirect } = useAuth0();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Email:', email);
-    console.log('Password:', password);
+  const handleLogin = () => {
+    loginWithRedirect();
   };
 
   return (
-    <form onSubmit={handleSubmit} className="login-form">
-      <div className="form-group">
-        <label htmlFor="email">Email</label>
-        <input
-          type="email"
-          id="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-      </div>
-      <div className="form-group">
-        <label htmlFor="password">Password</label>
-        <input
-          type="password"
-          id="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-      </div>
-      <button type="submit" className="login-button">Login</button>
-    </form>
+    <div className="login-form-container">
+      <form className="login-form" onSubmit={(e) => e.preventDefault()}>
+        <div className="form-group">
+          <label htmlFor="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            required
+          />
+        </div>
+        <button type="button" className="login-button" onClick={handleLogin}>
+          Login
+        </button>
+      </form>
+    </div>
   );
 };
 

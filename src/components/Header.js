@@ -27,6 +27,9 @@ const Header = () => {
           <li className={path === '/login' ? 'active' : ''}>
             <Link to="/login">Login</Link>
           </li>
+          <li className={path === '/signup' ? 'active' : ''}>
+            <Link to="/signup">Sign-Up</Link>
+          </li>
         </ul>
       </nav>
     </header>
