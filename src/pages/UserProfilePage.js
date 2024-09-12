@@ -1,10 +1,12 @@
 import React from 'react';
+import Profile from '../components/Profile';
+import '../assets/styles/UserProfilePage.css';
 
 const UserProfilePage = () => {
   return (
-    <div>
-      <h1>Your Profile</h1>
-      <p>View and edit your user profile information.</p>
+    <div className="user-profile-page">
+      <h1>User Profile</h1>
+      <Profile />
     </div>
   );
 };

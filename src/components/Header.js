@@ -4,31 +4,31 @@ import '../assets/styles/Header.css';
 
 const Header = () => {
   const location = useLocation();
-  const path = location.pathname;
 
   return (
     <header className="header-container">
       <div className="logo">
-        <Link to="/">
-          <h1>Event Planner</h1>
-        </Link>
+        <h1><Link to="/">Event Tracker</Link></h1>
       </div>
       <nav className="nav-menu">
         <ul>
-          <li className={path === '/' ? 'active' : ''}>
+          <li className={location.pathname === '/' ? 'active' : ''}>
             <Link to="/">Home</Link>
           </li>
-          <li className={path === '/events' ? 'active' : ''}>
-            <Link to="/events">Events</Link>
+          <li className={location.pathname === '/events' ? 'active' : ''}>
+            <Link to="/EventsPage">Events</Link>
           </li>
-          <li className={path === '/profile' ? 'active' : ''}>
+          <li className={location.pathname === '/about' ? 'active' : ''}>
+            <Link to="/about">About</Link>
+          </li>
+          <li className={location.pathname === '/contact' ? 'active' : ''}>
+            <Link to="/contact">Contact</Link>
+          </li>
+          <li className={location.pathname === '/profile' ? 'active' : ''}>
             <Link to="/profile">Profile</Link>
           </li>
-          <li className={path === '/login' ? 'active' : ''}>
-            <Link to="/login">Login</Link>
-          </li>
-          <li className={path === '/signup' ? 'active' : ''}>
-            <Link to="/signup">Sign-Up</Link>
+          <li className={location.pathname === '/auth' ? 'active' : ''}>
+            <Link to="/auth">Login / Sign Up</Link>
           </li>
         </ul>
       </nav>
