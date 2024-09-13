@@ -1,15 +1,21 @@
 import React from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
+import { useNavigate } from 'react-router-dom';
 import '../assets/styles/Profile.css';
 
 const Profile = () => {
   const { user, logout } = useAuth0();
+  const navigate = useNavigate();
 
   const events = [
     { id: 1, title: 'Event 1', date: '2024-10-01' },
     { id: 2, title: 'Event 2', date: '2024-10-15' },
     { id: 3, title: 'Event 3', date: '2024-11-05' },
   ];
+
+  const goToAdminDashboard = () => {
+    navigate('/admin/dashboard');
+  };
 
   return (
     <div className="profile-container">
@@ -32,9 +38,16 @@ const Profile = () => {
           <p>No events signed up for yet.</p>
         )}
       </div>
-      <button className="logout-button" onClick={() => logout({ returnTo: window.location.origin })}>
-        Log Out
-      </button>
+
+      <div className="buttons-container">
+        <button className="admin-dashboard-button" onClick={goToAdminDashboard}>
+          Admin Dashboard
+        </button>
+
+        <button className="logout-button" onClick={() => logout({ returnTo: window.location.origin })}>
+          Log Out
+        </button>
+      </div>
     </div>
   );
 };

@@ -22,7 +22,7 @@ const App = () => {
       <Header />
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/EventsPage" element={<EventsPage />} />
+        <Route path="/events" element={<EventsPage />} />
         <Route path="/event/:id" element={<EventDetailPage />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/create-event" element={<CreateEventPage />} />

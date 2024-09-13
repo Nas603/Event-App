@@ -33,11 +33,13 @@
   .hero h1 {
     font-size: 3rem;
     margin: 0 0 20px 0;
+    color: var(--white);
   }
   
   .hero p {
     font-size: 1.2rem;
     margin-bottom: 40px;
+    color: var(--white);
   }
   
   .cta-button {
