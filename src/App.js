@@ -8,7 +8,6 @@ import CreateEventPage from './pages/CreateEventPage';
 import ManageEventsPage from './pages/ManageEventsPage';
 import ReportsPage from './pages/ReportsPage';
 import UserProfilePage from './pages/UserProfilePage';
-import AuthPage from './pages/AuthPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import TermsPage from './pages/TermsPage';
@@ -29,7 +28,6 @@ const App = () => {
         <Route path="/admin/manage-events" element={<ManageEventsPage />} />
         <Route path="/admin/reports" element={<ReportsPage />} />
         <Route path="/profile" element={<UserProfilePage />} />
-        <Route path="/auth" element={<AuthPage />} />
         <Route path="/about" element={<AboutPage />} /> 
         <Route path="/contact" element={<ContactPage />} /> 
         <Route path="/terms" element={<TermsPage />} /> 
