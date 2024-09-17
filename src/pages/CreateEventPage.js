@@ -1,74 +1,96 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { EventContext } from '../context/EventContext';
 import '../assets/styles/CreateEventPage.css';
 
 const CreateEventPage = () => {
-    const [eventData, setEventData] = useState({
-        name: '',
-        date: '',
-        location: '',
-        description: ''
+  const { addEvent } = useContext(EventContext);
+  const [event, setEvent] = useState({
+    title: '',
+    date: '',
+    location: '',
+    description: '',
+  });
+  const [notification, setNotification] = useState('');
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setEvent((prevEvent) => ({
+      ...prevEvent,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    addEvent(event);
+    setNotification('Event created successfully!');
+    setEvent({
+      title: '',
+      date: '',
+      location: '',
+      description: '',
     });
+    setTimeout(() => setNotification(''), 3000);
+  };
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setEventData((prevData) => ({
-            ...prevData,
-            [name]: value
-        }));
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log('Event Created', eventData);
-    };
-
-    return (
-        <div className="create-event-container">
-            <h2>Create a New Event</h2>
-            <form onSubmit={handleSubmit} className="create-event-form">
-                <div className="form-group">
-                    <label htmlFor="name">Event Name</label>
-                    <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        value={eventData.name}
-                        onChange={handleChange}
-                    />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="date">Event Date</label>
-                    <input
-                        type="date"
-                        id="date"
-                        name="date"
-                        value={eventData.date}
-                        onChange={handleChange}
-                    />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="location">Event Location</label>
-                    <input
-                        type="text"
-                        id="location"
-                        name="location"
-                        value={eventData.location}
-                        onChange={handleChange}
-                    />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="description">Event Description</label>
-                    <textarea
-                        id="description"
-                        name="description"
-                        value={eventData.description}
-                        onChange={handleChange}
-                    ></textarea>
-                </div>
-                <button type="submit" className="create-event-button">Create Event</button>
-            </form>
+  return (
+    <div className="create-event-container">
+      {notification && (
+        <div className="notification-container">
+          <p>{notification}</p>
         </div>
-    );
+      )}
+      <form className="create-event-form" onSubmit={handleSubmit}>
+        <h2>Create Event</h2>
+        <div className="form-group">
+          <label htmlFor="title">Event Title</label>
+          <input
+            type="text"
+            id="title"
+            name="title"
+            value={event.title}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="date">Date</label>
+          <input
+            type="date"
+            id="date"
+            name="date"
+            value={event.date}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="location">Location</label>
+          <input
+            type="text"
+            id="location"
+            name="location"
+            value={event.location}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="description">Event Description</label>
+          <textarea
+            id="description"
+            name="description"
+            value={event.description}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <button type="submit" className="create-event-button">
+          Create Event
+        </button>
+      </form>
+    </div>
+  );
 };
 
 export default CreateEventPage;
