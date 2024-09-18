@@ -22,7 +22,7 @@ const CreateEventPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    addEvent(event);
+    addEvent({ ...event, id: Date.now() });
     setNotification('Event created successfully!');
     setEvent({
       title: '',

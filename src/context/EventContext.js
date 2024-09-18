@@ -1,35 +1,37 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
+import { useAuth0 } from '@auth0/auth0-react';
 
 export const EventContext = createContext();
 
 export const EventProvider = ({ children }) => {
+  const { user, isAuthenticated } = useAuth0();
   const [events, setEvents] = useState([]);
 
   useEffect(() => {
-    const savedEvents = localStorage.getItem('events');
-    if (savedEvents) {
-      setEvents(JSON.parse(savedEvents));
+    if (isAuthenticated && user) {
+      const storedEvents = JSON.parse(localStorage.getItem(user.sub)) || [];
+      setEvents(storedEvents);
     }
-  }, []);
+  }, [isAuthenticated, user]);
 
-  const addEvent = (event) => {
-    const updatedEvents = [...events, event];
+  const addEvent = (newEvent) => {
+    const updatedEvents = [...events, newEvent];
     setEvents(updatedEvents);
-    localStorage.setItem('events', JSON.stringify(updatedEvents));
+    localStorage.setItem(user.sub, JSON.stringify(updatedEvents));
   };
 
   const editEvent = (updatedEvent) => {
-    const updatedEvents = events.map(event =>
+    const updatedEvents = events.map((event) =>
       event.id === updatedEvent.id ? updatedEvent : event
     );
     setEvents(updatedEvents);
-    localStorage.setItem('events', JSON.stringify(updatedEvents));
+    localStorage.setItem(user.sub, JSON.stringify(updatedEvents));
   };
 
   const deleteEvent = (id) => {
-    const updatedEvents = events.filter(event => event.id !== id);
+    const updatedEvents = events.filter((event) => event.id !== id);
     setEvents(updatedEvents);
-    localStorage.setItem('events', JSON.stringify(updatedEvents));
+    localStorage.setItem(user.sub, JSON.stringify(updatedEvents));
   };
 
   return (
@@ -38,5 +40,3 @@ export const EventProvider = ({ children }) => {
     </EventContext.Provider>
   );
 };
-
-export const useEventContext = () => useContext(EventContext);
