@@ -1,17 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const SearchBar = ({ searchTerm, setSearchTerm }) => {
-  const onChange = (e) => {
-    setSearchTerm(e.target.value);
+  const [localQuery, setLocalQuery] = useState(searchTerm);
+
+  const handleSearch = () => {
+    setSearchTerm(localQuery);
   };
 
   return (
-    <input
-      type="text"
-      value={searchTerm}
-      onChange={onChange}
-      placeholder="Search events"
-    />
+    <div className="search-bar">
+      <input
+        type="text"
+        value={localQuery}
+        onChange={(e) => setLocalQuery(e.target.value)}
+        placeholder="Search events..."
+        className="search-input"
+      />
+      <button className="search-button" onClick={handleSearch}>
+        Search
+      </button>
+    </div>
   );
 };
 

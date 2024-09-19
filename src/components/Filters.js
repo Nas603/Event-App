@@ -1,22 +1,31 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-const Filters = ({ selectedCategory, setSelectedCategory }) => {
-  const categories = ['All', 'Music', 'Art', 'Technology'];
+const Filters = ({ onFilterChange }) => {
+  const [filterDate, setFilterDate] = useState('');
+  const [filterLocation, setFilterLocation] = useState('');
+
+  const handleFilterChange = () => {
+    if (onFilterChange) {
+      onFilterChange({ date: filterDate, location: filterLocation });
+    }
+  };
 
   return (
-    <div className="filters">
-      <label htmlFor="category">Filter by category: </label>
-      <select
-        id="category"
-        value={selectedCategory}
-        onChange={(e) => setSelectedCategory(e.target.value)}
-      >
-        {categories.map((category) => (
-          <option key={category} value={category}>
-            {category}
-          </option>
-        ))}
-      </select>
+    <div className="filters-content">
+      <input
+        type="date"
+        value={filterDate}
+        onChange={(e) => setFilterDate(e.target.value)}
+      />
+      <input
+        type="text"
+        value={filterLocation}
+        onChange={(e) => setFilterLocation(e.target.value)}
+        placeholder="Filter by Location"
+      />
+      <button onClick={handleFilterChange} className="filter-button">
+        Apply Filters
+      </button>
     </div>
   );
 };
