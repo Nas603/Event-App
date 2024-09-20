@@ -1,4 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { EventContext } from '../context/EventContext';
 import Filters from '../components/Filters';
 import SearchBar from '../components/SearchBar';
@@ -10,6 +11,7 @@ const EventsPage = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState({ date: '', location: '' });
+  const navigate = useNavigate();
 
   const eventsPerPage = 6;
 
@@ -39,6 +41,10 @@ const EventsPage = () => {
     setCurrentPage(1);
   }, [searchTerm, showFilters, filters]);
 
+  const handleViewDetails = (eventId) => {
+    navigate(`/event/${eventId}`);
+  };
+
   return (
     <div className="events-page">
       <div className="events-header">
@@ -60,7 +66,9 @@ const EventsPage = () => {
               <p><strong>Date:</strong> {event.date}</p>
               <p><strong>Location:</strong> {event.location}</p>
               <p className="event-description">{event.description}</p>
-              <button className="view-details-btn">View Details</button>
+              <button className="view-details-btn" onClick={() => handleViewDetails(event.id)}>
+                View Details
+              </button>
             </div>
           ))
         ) : (

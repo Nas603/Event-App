@@ -1,10 +1,14 @@
 import React, { useState, useContext } from 'react';
 import { EventContext } from '../context/EventContext';
+import { useAuth0 } from '@auth0/auth0-react';
 import '../assets/styles/ManageEventsPage.css';
 
 const ManageEventsPage = () => {
   const { events, editEvent, deleteEvent } = useContext(EventContext);
   const [editingEvent, setEditingEvent] = useState(null);
+  const { user } = useAuth0();
+
+  const userEvents = events.filter(event => event.userId === user.sub);
 
   const handleEditClick = (event) => {
     setEditingEvent({ ...event });
@@ -25,12 +29,12 @@ const ManageEventsPage = () => {
 
   return (
     <div className="manage-events-container">
-      <h2>Manage Events</h2>
-      {events.length === 0 ? (
-        <p>No events found.</p>
+      <h2>Manage Your Events</h2>
+      {userEvents.length === 0 ? (
+        <p>You haven't created any events yet.</p>
       ) : (
         <ul className="event-list">
-          {events.map((event) => (
+          {userEvents.map((event) => (
             <li key={event.id} className="event-item">
               {editingEvent && editingEvent.id === event.id ? (
                 <div className="edit-event-form">
