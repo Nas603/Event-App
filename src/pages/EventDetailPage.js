@@ -1,30 +1,56 @@
 import React, { useContext } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { EventContext } from '../context/EventContext';
+import { useAuth0 } from '@auth0/auth0-react';
 import '../assets/styles/EventDetailPage.css';
 
 const EventDetailPage = () => {
+  const { events, signUpForEvent } = useContext(EventContext);
   const { id } = useParams();
-  const { events } = useContext(EventContext);
+  const { user } = useAuth0();
+  const navigate = useNavigate();
+
   const event = events.find(event => event.id === id);
 
   if (!event) {
     return <p>Event not found.</p>;
   }
 
+  const isAlreadySignedUp = event.signedUpUsers?.includes(user?.sub);
+
+  const handleSignUp = () => {
+    if (!user) {
+      alert('Please log in to sign up for this event.');
+      return;
+    }
+
+    if (isAlreadySignedUp) {
+      alert('You have already signed up for this event.');
+    } else {
+      signUpForEvent(event.id);
+      alert('You have signed up for this event!');
+      navigate('/profile');
+    }
+  };
+
+
   return (
     <div className="event-detail-container">
-      <h2 className="event-title">{event.title}</h2>
-      <div className="event-info">
-        <p className="event-date"><strong>Date:</strong> {event.date}</p>
-        <p className="event-location"><strong>Location:</strong> {event.location}</p>
+      <h1>{event.title}</h1>
+      <p><strong>Date:</strong> {event.date}</p>
+      <p><strong>Time:</strong> {event.startTime} - {event.endTime}</p> {/* Add this line */}
+      <p><strong>Location:</strong> {event.location}</p>
+      <p><strong>Description:</strong> {event.description}</p>
+  
+      <div className="event-detail-buttons">
+        <button className="sign-up-btn" onClick={handleSignUp}>
+          Sign Up for Event
+        </button>
+        <button className="back-btn" onClick={() => navigate('/events')}>
+          Back to Events
+        </button>
       </div>
-      <p className="event-description">{event.description}</p>
-      <button className="back-button" onClick={() => window.history.back()}>
-        Back to Events
-      </button>
     </div>
   );
 };
-
 export default EventDetailPage;

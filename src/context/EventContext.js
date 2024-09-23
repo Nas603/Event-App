@@ -44,8 +44,31 @@ export const EventProvider = ({ children }) => {
     setEvents((prevEvents) => prevEvents.filter((event) => event.id !== id));
   };
 
+  const signUpForEvent = (eventId) => {
+    if (!user) {
+      console.log('User not logged in');
+      return;
+    }
+
+    setEvents((prevEvents) => {
+      return prevEvents.map((event) => {
+        if (event.id === eventId) {
+          const isAlreadySignedUp = event.signedUpUsers?.includes(user.sub);
+
+          if (!isAlreadySignedUp) {
+            return {
+              ...event,
+              signedUpUsers: [...(event.signedUpUsers || []), user.sub],
+            };
+          }
+        }
+        return event;
+      });
+    });
+  };
+
   return (
-    <EventContext.Provider value={{ events, addEvent, editEvent, deleteEvent }}>
+    <EventContext.Provider value={{ events, addEvent, editEvent, deleteEvent, signUpForEvent }}>
       {children}
     </EventContext.Provider>
   );

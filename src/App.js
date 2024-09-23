@@ -14,27 +14,30 @@ import TermsPage from './pages/TermsPage';
 import PrivacyPage from './pages/PrivacyPage';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import './assets/styles/index.css';
 
 const App = () => {
   return (
-    <>
+    <div className="app-container">
       <Header />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/events" element={<EventsPage />} />
-        <Route path="/event/:id" element={<EventDetailPage />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="/admin/create-event" element={<CreateEventPage />} />
-        <Route path="/admin/manage-events" element={<ManageEventsPage />} />
-        <Route path="/admin/reports" element={<ReportsPage />} />
-        <Route path="/profile" element={<UserProfilePage />} />
-        <Route path="/about" element={<AboutPage />} /> 
-        <Route path="/contact" element={<ContactPage />} /> 
-        <Route path="/terms" element={<TermsPage />} /> 
-        <Route path="/privacy" element={<PrivacyPage />} /> 
-      </Routes>
+      <div className="main-content">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/events" element={<EventsPage />} />
+          <Route path="/event/:id" element={<EventDetailPage />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/create-event" element={<CreateEventPage />} />
+          <Route path="/admin/manage-events" element={<ManageEventsPage />} />
+          <Route path="/admin/reports" element={<ReportsPage />} />
+          <Route path="/profile" element={<UserProfilePage />} />
+          <Route path="/about" element={<AboutPage />} /> 
+          <Route path="/contact" element={<ContactPage />} /> 
+          <Route path="/terms" element={<TermsPage />} /> 
+          <Route path="/privacy" element={<PrivacyPage />} /> 
+        </Routes>
+      </div>
       <Footer />
-    </>
+    </div>
   );
 };
 

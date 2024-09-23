@@ -7,6 +7,8 @@ const CreateEventPage = () => {
   const [event, setEvent] = useState({
     title: '',
     date: '',
+    startTime: '',
+    endTime: '',
     location: '',
     description: '',
   });
@@ -22,14 +24,28 @@ const CreateEventPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    const selectedDate = new Date(event.date);
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+
+    if (selectedDate < currentDate) {
+      setNotification('The event date cannot be in the past. Please select a valid date.');
+      setTimeout(() => setNotification(''), 3000);
+      return;
+    }
+
     addEvent({ ...event, id: Date.now() });
     setNotification('Event created successfully!');
     setEvent({
       title: '',
       date: '',
+      startTime: '',
+      endTime: '',
       location: '',
       description: '',
     });
+
     setTimeout(() => setNotification(''), 3000);
   };
 
@@ -60,6 +76,28 @@ const CreateEventPage = () => {
             id="date"
             name="date"
             value={event.date}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="startTime">Start Time</label>
+          <input
+            type="time"
+            id="startTime"
+            name="startTime"
+            value={event.startTime}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="endTime">End Time</label>
+          <input
+            type="time"
+            id="endTime"
+            name="endTime"
+            value={event.endTime}
             onChange={handleChange}
             required
           />

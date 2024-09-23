@@ -44,4 +44,25 @@
   .back-button:hover {
     background-color: #555;
   }
+  .event-detail-buttons {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+  }
+  
+  .sign-up-btn,
+  .back-btn {
+    background-color: black;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .sign-up-btn:hover,
+  .back-btn:hover {
+    background-color: #333;
+  }
   

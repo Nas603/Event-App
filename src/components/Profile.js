@@ -1,50 +1,60 @@
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
-import { useNavigate } from 'react-router-dom';
+import { EventContext } from '../context/EventContext';
 import '../assets/styles/Profile.css';
+import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
-  const { user, logout } = useAuth0();
+  const { user, isLoading, isAuthenticated, logout } = useAuth0();
+  const { events } = useContext(EventContext);
+  const [signedUpEvents, setSignedUpEvents] = useState([]);
   const navigate = useNavigate();
 
-  const events = [
-    { id: 1, title: 'Event 1', date: '2024-10-01' },
-    { id: 2, title: 'Event 2', date: '2024-10-15' },
-    { id: 3, title: 'Event 3', date: '2024-11-05' },
-  ];
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      const userSignedUpEvents = events.filter(event => event.signedUpUsers?.includes(user.sub));
+      setSignedUpEvents(userSignedUpEvents);
+    }
+  }, [isAuthenticated, user, events]);
 
-  const goToAdminDashboard = () => {
-    navigate('/admin/dashboard');
-  };
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!user) {
+    return <div>Please log in to view your profile.</div>;
+  }
 
   return (
     <div className="profile-container">
-      <h2>Profile Details</h2>
+      <h1 className="profile-title">Profile</h1>
       <div className="profile-info">
-        <p><strong>Name:</strong> {user.name}</p>
-        <p><strong>Email:</strong> {user.email}</p>
+        <h2>Name: {user.name}</h2>
+        <p>Email: {user.email}</p>
       </div>
       <div className="signed-up-events">
-        <h3>Signed-Up Events</h3>
-        {events.length > 0 ? (
-          <ul>
-            {events.map(event => (
-              <li key={event.id}>
-                <strong>{event.title}</strong> - {event.date}
+        <h3 className="events-title">Signed Up Events:</h3>
+        {signedUpEvents.length > 0 ? (
+          <ul className="events-list">
+            {signedUpEvents.map(event => (
+              <li key={event.id} className="event-item">
+                <span>{event.title} - {event.date}</span>
               </li>
             ))}
           </ul>
         ) : (
-          <p>No events signed up for yet.</p>
+          <p>You have not signed up for any events.</p>
         )}
       </div>
-
       <div className="buttons-container">
-        <button className="admin-dashboard-button" onClick={goToAdminDashboard}>
+        <button 
+          onClick={() => navigate('/admin/dashboard')} 
+          className="admin-dashboard-button">
           Admin Dashboard
         </button>
-
-        <button className="logout-button" onClick={() => logout({ returnTo: window.location.origin })}>
+        <button 
+          onClick={() => logout({ returnTo: window.location.origin })} 
+          className="logout-button">
           Log Out
         </button>
       </div>
