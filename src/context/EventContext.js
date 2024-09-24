@@ -30,6 +30,7 @@ export const EventProvider = ({ children }) => {
       ...newEvent,
       id: Math.random().toString(36).substr(2, 9),
       userId: user ? user.sub : null,
+      createdBy: user ? user.name || user.email : 'Unknown',
     };
     setEvents((prevEvents) => [...prevEvents, eventWithUser]);
   };
@@ -67,8 +68,19 @@ export const EventProvider = ({ children }) => {
     });
   };
 
+  const getTotalRegistrationsForUserEvents = () => {
+    if (!user) return 0;
+
+    return events.reduce((total, event) => {
+      if (event.userId === user.sub) {
+        return total + (event.signedUpUsers?.length || 0);
+      }
+      return total;
+    }, 0);
+  };
+
   return (
-    <EventContext.Provider value={{ events, addEvent, editEvent, deleteEvent, signUpForEvent }}>
+    <EventContext.Provider value={{ events, addEvent, editEvent, deleteEvent, signUpForEvent, getTotalRegistrationsForUserEvents }}>
       {children}
     </EventContext.Provider>
   );

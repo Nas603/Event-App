@@ -27,6 +27,13 @@ const ManageEventsPage = () => {
     deleteEvent(id);
   };
 
+  const formatTime = (time) => {
+    const [hours, minutes] = time.split(':');
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const formattedHours = hours % 12 || 12;
+    return `${formattedHours}:${minutes} ${period}`;
+  };
+
   return (
     <div className="manage-events-container">
       <h2>Manage Your Events</h2>
@@ -62,6 +69,30 @@ const ManageEventsPage = () => {
                     />
                   </div>
                   <div className="form-group">
+                    <label htmlFor="startTime">Start Time</label>
+                    <input
+                      type="text"
+                      id="startTime"
+                      placeholder="hh:mm AM/PM"
+                      value={editingEvent.startTime}
+                      onChange={(e) =>
+                        setEditingEvent({ ...editingEvent, startTime: e.target.value })
+                      }
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="endTime">End Time</label>
+                    <input
+                      type="text"
+                      id="endTime"
+                      placeholder="hh:mm AM/PM"
+                      value={editingEvent.endTime}
+                      onChange={(e) =>
+                        setEditingEvent({ ...editingEvent, endTime: e.target.value })
+                      }
+                    />
+                  </div>
+                  <div className="form-group">
                     <label htmlFor="location">Location</label>
                     <input
                       type="text"
@@ -93,6 +124,8 @@ const ManageEventsPage = () => {
                 <div>
                   <h3>{event.title}</h3>
                   <p>Date: {event.date}</p>
+                  <p>Start Time: {formatTime(event.startTime)}</p>
+                  <p>End Time: {formatTime(event.endTime)}</p>
                   <p>Location: {event.location}</p>
                   <p>{event.description}</p>
                   <div className="event-actions">

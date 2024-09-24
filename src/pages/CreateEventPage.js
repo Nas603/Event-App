@@ -1,5 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { EventContext } from '../context/EventContext';
+import Alert from '../components/Alert';
 import '../assets/styles/CreateEventPage.css';
 
 const CreateEventPage = () => {
@@ -13,6 +14,7 @@ const CreateEventPage = () => {
     description: '',
   });
   const [notification, setNotification] = useState('');
+  const [alertColor, setAlertColor] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -30,13 +32,12 @@ const CreateEventPage = () => {
     currentDate.setHours(0, 0, 0, 0);
 
     if (selectedDate < currentDate) {
-      setNotification('The event date cannot be in the past. Please select a valid date.');
-      setTimeout(() => setNotification(''), 3000);
+      showAlert('The event date cannot be in the past. Please select a valid date.', 'red');
       return;
     }
 
     addEvent({ ...event, id: Date.now() });
-    setNotification('Event created successfully!');
+    showAlert('Event created successfully', 'green');
     setEvent({
       title: '',
       date: '',
@@ -45,16 +46,22 @@ const CreateEventPage = () => {
       location: '',
       description: '',
     });
+  };
 
-    setTimeout(() => setNotification(''), 3000);
+  const showAlert = (message, color) => {
+    setNotification(message);
+    setAlertColor(color);
+  };
+
+  const handleAlertClose = () => {
+    setNotification('');
+    setAlertColor('');
   };
 
   return (
     <div className="create-event-container">
       {notification && (
-        <div className="notification-container">
-          <p>{notification}</p>
-        </div>
+        <Alert message={notification} onClose={handleAlertClose} color={alertColor} />
       )}
       <form className="create-event-form" onSubmit={handleSubmit}>
         <h2>Create Event</h2>
