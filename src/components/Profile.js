@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
   const { user, isLoading, isAuthenticated, logout } = useAuth0();
-  const { events } = useContext(EventContext);
+  const { events, unregisterFromEvent } = useContext(EventContext);
   const [signedUpEvents, setSignedUpEvents] = useState([]);
   const navigate = useNavigate();
 
@@ -16,6 +16,11 @@ const Profile = () => {
       setSignedUpEvents(userSignedUpEvents);
     }
   }, [isAuthenticated, user, events]);
+
+  const handleUnregister = (eventId) => {
+    unregisterFromEvent(eventId, user.sub);
+    setSignedUpEvents(prevEvents => prevEvents.filter(event => event.id !== eventId));
+  };
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -36,11 +41,27 @@ const Profile = () => {
         <h3 className="events-title">Signed Up Events:</h3>
         {signedUpEvents.length > 0 ? (
           <ul className="events-list">
-            {signedUpEvents.map(event => (
-              <li key={event.id} className="event-item">
-                <span>{event.title} - {event.date}</span>
-              </li>
-            ))}
+            {signedUpEvents.map(event => {
+              const isEventPassed = new Date(event.date) < new Date();  // Check if the event has passed
+              return (
+                <li key={event.id} className="event-item">
+                  <span>{event.title} - {event.date}</span>
+                  {isEventPassed ? (
+                    <button 
+                      onClick={() => navigate(`/review-event/${event.id}`)} 
+                      className="rate-event-button">
+                      Rate Event
+                    </button>
+                  ) : (
+                    <button 
+                      onClick={() => handleUnregister(event.id)} 
+                      className="unregister-button">
+                      Unregister
+                    </button>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         ) : (
           <p>You have not signed up for any events.</p>

@@ -5,23 +5,22 @@ import { useAuth0 } from '@auth0/auth0-react';
 import '../assets/styles/AdminDashboard.css';
 
 const AdminDashboard = () => {
-  const { events } = useContext(EventContext);
+  const { events = [] } = useContext(EventContext);
   const { user } = useAuth0();
   const [upcomingEvents, setUpcomingEvents] = useState(0);
   const [totalRegistrations, setTotalRegistrations] = useState(0);
-  const [recentFeedback] = useState([
-    "Great event!",
-    "Loved the venue",
-    "Could be better",
-  ]);
+  const [recentFeedback, setRecentFeedback] = useState([]);
 
   useEffect(() => {
+    if (!events || !user) return;
+
     const today = new Date();
     const tenDaysFromNow = new Date();
     tenDaysFromNow.setDate(today.getDate() + 10);
 
-    const userEvents = events.filter(event => event.userId === user?.sub);
-    
+    const userId = user.sub;
+    const userEvents = events.filter(event => event.userId === userId);
+
     const upcomingEventsCount = userEvents.filter(event => {
       const eventDate = new Date(event.date);
       return eventDate >= today && eventDate <= tenDaysFromNow;
@@ -31,8 +30,21 @@ const AdminDashboard = () => {
       return total + (event.signedUpUsers?.length || 0);
     }, 0);
 
+    const feedbackList = events.reduce((acc, event) => {
+      return acc.concat(event.feedback || []);
+    }, []);
+
+    console.log('Feedback List:', feedbackList);
+
+    const recentFeedbackList = feedbackList.slice(-3).map(feedback => (
+      `Rating: ${feedback.rating}, Comments: ${feedback.comments}`
+    ));
+
+    console.log('Recent Feedback List:', recentFeedbackList);
+
     setUpcomingEvents(upcomingEventsCount);
     setTotalRegistrations(totalUserRegistrations);
+    setRecentFeedback(recentFeedbackList);
   }, [events, user]);
 
   return (
@@ -51,9 +63,13 @@ const AdminDashboard = () => {
         <div className="stat-card recent-feedback">
           <h3>Recent Feedback</h3>
           <ul>
-            {recentFeedback.slice(0, 3).map((feedback, index) => (
-              <li key={index}>{feedback}</li>
-            ))}
+            {recentFeedback.length > 0 ? (
+              recentFeedback.map((comment, index) => (
+                <li key={index}>{comment}</li>
+              ))
+            ) : (
+              <li>No feedback available yet</li>
+            )}
           </ul>
         </div>
       </div>

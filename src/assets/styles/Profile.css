@@ -65,3 +65,47 @@
 .logout-button:hover {
   background-color: #555;
 }
+
+.unregister-button {
+  background-color: #dc3545;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-left: 10px;
+}
+
+.unregister-button:hover {
+  background-color: #c82333;
+  transform: translateY(-2px);
+}
+
+.unregister-button:focus {
+  outline: none;
+  box-shadow: 0 0 5px darkred;
+}
+
+.rate-event-button {
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  margin-left: 10px;
+}
+
+.rate-event-button:hover {
+  background-color: #218838;
+  transform: translateY(-2px);
+}
+
+.rate-event-button:focus {
+  outline: none;
+  box-shadow: 0 0 5px rgba(40, 167, 69, 0.5);
+}

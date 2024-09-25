@@ -7,6 +7,11 @@ export const EventProvider = ({ children }) => {
   const [events, setEvents] = useState([]);
   const { user } = useAuth0();
 
+  const saveEventsToLocalStorage = (events) => {
+    localStorage.setItem('events', JSON.stringify(events));
+    console.log('Saved events to localStorage:', events);
+};
+
   useEffect(() => {
     const storedEvents = localStorage.getItem('events');
     if (storedEvents) {
@@ -31,6 +36,7 @@ export const EventProvider = ({ children }) => {
       id: Math.random().toString(36).substr(2, 9),
       userId: user ? user.sub : null,
       createdBy: user ? user.name || user.email : 'Unknown',
+      feedback: [],
     };
     setEvents((prevEvents) => [...prevEvents, eventWithUser]);
   };
@@ -68,6 +74,38 @@ export const EventProvider = ({ children }) => {
     });
   };
 
+  const unregisterFromEvent = (eventId, userId) => {
+    setEvents((prevEvents) => {
+      return prevEvents.map((event) => {
+        if (event.id === eventId) {
+          return {
+            ...event,
+            signedUpUsers: event.signedUpUsers?.filter((user) => user !== userId),
+          };
+        }
+        return event;
+      });
+    });
+  };
+
+  const addFeedbackToEvent = (eventId, feedback) => {
+    setEvents(prevEvents => {
+      const updatedEvents = prevEvents.map(event => {
+        if (event.id === eventId) {
+          return {
+            ...event,
+            feedback: [...(event.feedback || []), feedback]
+          };
+        }
+        return event;
+      });
+  
+      saveEventsToLocalStorage(updatedEvents);
+      return updatedEvents;
+    });
+  };
+
+
   const getTotalRegistrationsForUserEvents = () => {
     if (!user) return 0;
 
@@ -80,7 +118,18 @@ export const EventProvider = ({ children }) => {
   };
 
   return (
-    <EventContext.Provider value={{ events, addEvent, editEvent, deleteEvent, signUpForEvent, getTotalRegistrationsForUserEvents }}>
+    <EventContext.Provider
+      value={{
+        events,
+        addEvent,
+        editEvent,
+        deleteEvent,
+        signUpForEvent,
+        unregisterFromEvent,
+        addFeedbackToEvent,
+        getTotalRegistrationsForUserEvents,
+      }}
+    >
       {children}
     </EventContext.Provider>
   );

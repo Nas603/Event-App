@@ -12,6 +12,7 @@ import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import TermsPage from './pages/TermsPage';
 import PrivacyPage from './pages/PrivacyPage';
+import ReviewEvent from './pages/ReviewEvent';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import './assets/styles/index.css';
@@ -30,6 +31,7 @@ const App = () => {
           <Route path="/admin/manage-events" element={<ManageEventsPage />} />
           <Route path="/admin/reports" element={<ReportsPage />} />
           <Route path="/profile" element={<UserProfilePage />} />
+          <Route path="/review-event/:id" element={<ReviewEvent />} />
           <Route path="/about" element={<AboutPage />} /> 
           <Route path="/contact" element={<ContactPage />} /> 
           <Route path="/terms" element={<TermsPage />} /> 

@@ -26,18 +26,25 @@ const CreateEventPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    const selectedDate = new Date(event.date);
+  
+    const selectedDateString = event.date;
+    const [year, month, day] = selectedDateString.split('-');
+    const selectedDate = new Date(year, month - 1, day);
+  
     const currentDate = new Date();
     currentDate.setHours(0, 0, 0, 0);
-
+  
+    console.log("Selected Date (parsed):", selectedDate.toDateString());
+    console.log("Current Date (parsed):", currentDate.toDateString());
+  
     if (selectedDate < currentDate) {
       showAlert('The event date cannot be in the past. Please select a valid date.', 'red');
       return;
     }
-
+  
     addEvent({ ...event, id: Date.now() });
     showAlert('Event created successfully', 'green');
+  
     setEvent({
       title: '',
       date: '',
@@ -47,6 +54,8 @@ const CreateEventPage = () => {
       description: '',
     });
   };
+  
+  
 
   const showAlert = (message, color) => {
     setNotification(message);
@@ -79,12 +88,12 @@ const CreateEventPage = () => {
         <div className="form-group">
           <label htmlFor="date">Date</label>
           <input
-            type="date"
-            id="date"
-            name="date"
-            value={event.date}
-            onChange={handleChange}
-            required
+          type="date"
+          id="date"
+          name="date"
+          value={event.date}
+          onChange={handleChange}
+          required
           />
         </div>
         <div className="form-group">
