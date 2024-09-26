@@ -7,45 +7,36 @@ import '../assets/styles/AdminDashboard.css';
 const AdminDashboard = () => {
   const { events = [] } = useContext(EventContext);
   const { user } = useAuth0();
-  const [upcomingEvents, setUpcomingEvents] = useState(0);
-  const [totalRegistrations, setTotalRegistrations] = useState(0);
+  const [upcomingEvents] = useState(0);
+  const [totalRegistrations] = useState(0);
   const [recentFeedback, setRecentFeedback] = useState([]);
 
   useEffect(() => {
     if (!events || !user) return;
-
-    const today = new Date();
-    const tenDaysFromNow = new Date();
-    tenDaysFromNow.setDate(today.getDate() + 10);
-
+  
     const userId = user.sub;
-    const userEvents = events.filter(event => event.userId === userId);
-
-    const upcomingEventsCount = userEvents.filter(event => {
-      const eventDate = new Date(event.date);
-      return eventDate >= today && eventDate <= tenDaysFromNow;
-    }).length;
-
-    const totalUserRegistrations = userEvents.reduce((total, event) => {
-      return total + (event.signedUpUsers?.length || 0);
-    }, 0);
-
-    const feedbackList = events.reduce((acc, event) => {
-      return acc.concat(event.feedback || []);
+    const userEvents = events.filter(userEvent => userEvent.userId === userId);
+  
+    console.log('Loaded Events:', events);
+    console.log('User Events:', userEvents);
+  
+    const feedbackList = userEvents.reduce((acc, userEvent) => {
+      console.log('User Event:', JSON.stringify(userEvent, null, 2));
+  
+      if (userEvent.feedback && userEvent.feedback.length > 0) {
+        const feedbackWithEventDetails = userEvent.feedback.map(feedback => ({
+          ...feedback,
+          eventName: userEvent.title,
+        }));
+        return acc.concat(feedbackWithEventDetails);
+      }
+      return acc;
     }, []);
-
-    console.log('Feedback List:', feedbackList);
-
-    const recentFeedbackList = feedbackList.slice(-3).map(feedback => (
-      `Rating: ${feedback.rating}, Comments: ${feedback.comments}`
-    ));
-
-    console.log('Recent Feedback List:', recentFeedbackList);
-
-    setUpcomingEvents(upcomingEventsCount);
-    setTotalRegistrations(totalUserRegistrations);
-    setRecentFeedback(recentFeedbackList);
-  }, [events, user]);
+  
+    setRecentFeedback(feedbackList.slice(-3).map(feedback => (
+      `Event: ${feedback.eventName}, Rating: ${feedback.rating}, Comments: ${feedback.comments}`
+    )));
+  }, [events, user]);     
 
   return (
     <div className="admin-dashboard-container">

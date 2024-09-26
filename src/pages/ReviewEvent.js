@@ -1,8 +1,11 @@
 import React, { useContext, useState } from 'react';
 import { EventContext } from '../context/EventContext';
+import { useParams } from 'react-router-dom';
 import '../assets/styles/ReviewEvent.css';
 
-const ReviewEvent = ({ eventId }) => {
+const ReviewEvent = () => {
+    const { id: eventId } = useParams();
+    console.log('Event ID from URL:', eventId);
     const { addFeedbackToEvent } = useContext(EventContext);
     const [rating, setRating] = useState('');
     const [comments, setComments] = useState('');
@@ -11,7 +14,7 @@ const ReviewEvent = ({ eventId }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         const feedback = { rating, comments };
-        console.log('Submitting feedback:', feedback);
+        console.log('Submitting feedback:', feedback, 'for eventId:', eventId);
         addFeedbackToEvent(eventId, feedback);
         setSubmitted(true);
     };

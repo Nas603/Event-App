@@ -7,10 +7,6 @@ export const EventProvider = ({ children }) => {
   const [events, setEvents] = useState([]);
   const { user } = useAuth0();
 
-  const saveEventsToLocalStorage = (events) => {
-    localStorage.setItem('events', JSON.stringify(events));
-    console.log('Saved events to localStorage:', events);
-};
 
   useEffect(() => {
     const storedEvents = localStorage.getItem('events');
@@ -32,14 +28,14 @@ export const EventProvider = ({ children }) => {
 
   const addEvent = (newEvent) => {
     const eventWithUser = {
-      ...newEvent,
-      id: Math.random().toString(36).substr(2, 9),
-      userId: user ? user.sub : null,
-      createdBy: user ? user.name || user.email : 'Unknown',
-      feedback: [],
+        ...newEvent,
+        id: Math.random().toString(36).substr(2, 9),
+        userId: user ? user.sub : null,
+        createdBy: user ? user.name || user.email : 'Unknown',
+        feedback: [],
     };
     setEvents((prevEvents) => [...prevEvents, eventWithUser]);
-  };
+};
 
   const editEvent = (updatedEvent) => {
     setEvents((prevEvents) =>
@@ -88,22 +84,28 @@ export const EventProvider = ({ children }) => {
     });
   };
 
-  const addFeedbackToEvent = (eventId, feedback) => {
-    setEvents(prevEvents => {
-      const updatedEvents = prevEvents.map(event => {
-        if (event.id === eventId) {
-          return {
-            ...event,
-            feedback: [...(event.feedback || []), feedback]
-          };
-        }
-        return event;
-      });
-  
-      saveEventsToLocalStorage(updatedEvents);
-      return updatedEvents;
+  const saveEventsToLocalStorage = (updatedEvents) => {
+    localStorage.setItem('events', JSON.stringify(updatedEvents));
+};
+
+const addFeedbackToEvent = (eventId, feedback) => {
+  setEvents((prevEvents) => {
+    const updatedEvents = prevEvents.map(event => {
+      if (event.id === eventId) {
+        console.log('Adding feedback to event:', event);
+        return {
+          ...event,
+          feedback: [...(event.feedback || []), feedback],
+        };
+      }
+      return event;
     });
-  };
+
+    saveEventsToLocalStorage(updatedEvents);
+    console.log('Updated events after adding feedback:', updatedEvents);
+    return updatedEvents;
+  });
+};
 
 
   const getTotalRegistrationsForUserEvents = () => {
