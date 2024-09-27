@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useCallback } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 
 export const EventContext = createContext();
@@ -7,15 +7,12 @@ export const EventProvider = ({ children }) => {
   const [events, setEvents] = useState([]);
   const { user } = useAuth0();
 
-
   useEffect(() => {
     const storedEvents = localStorage.getItem('events');
     if (storedEvents) {
       const parsedEvents = JSON.parse(storedEvents);
-      console.log('Loaded events from localStorage:', parsedEvents);
       setEvents(parsedEvents);
-    } else {
-      console.log('No events found in localStorage');
+      console.log('Loaded events from localStorage:', parsedEvents);
     }
   }, []);
 
@@ -24,18 +21,44 @@ export const EventProvider = ({ children }) => {
       localStorage.setItem('events', JSON.stringify(events));
       console.log('Saved events to localStorage:', events);
     }
-  }, [events]);
+  }, [events]);  
+
+  const removePastEvents = useCallback(() => {
+    const now = new Date();
+    const filteredEvents = events.filter(event => {
+      const eventEndTime = new Date(`${event.date}T${event.endTime}`);
+      return eventEndTime > now;
+    });
+  
+    console.log('Filtered events after past event removal:', filteredEvents);
+  
+    if (filteredEvents.length !== events.length) {
+      setEvents(filteredEvents);
+    }
+  }, [events]);  
+
+  useEffect(() => {
+  }, [removePastEvents]);
 
   const addEvent = (newEvent) => {
     const eventWithUser = {
-        ...newEvent,
-        id: Math.random().toString(36).substr(2, 9),
-        userId: user ? user.sub : null,
-        createdBy: user ? user.name || user.email : 'Unknown',
-        feedback: [],
+      ...newEvent,
+      id: Math.random().toString(36).substr(2, 9),
+      userId: user ? user.sub : null,
+      createdBy: user ? user.name || user.email : 'Unknown',
+      feedback: [],
+      signedUpUsers: [],
     };
-    setEvents((prevEvents) => [...prevEvents, eventWithUser]);
-};
+    
+    console.log("Adding event:", eventWithUser);
+    
+    setEvents((prevEvents) => {
+      const updatedEvents = [...prevEvents, eventWithUser];
+      localStorage.setItem('events', JSON.stringify(updatedEvents));
+      console.log("Updated events:", updatedEvents);
+      return updatedEvents;
+    });
+  };
 
   const editEvent = (updatedEvent) => {
     setEvents((prevEvents) =>
@@ -84,29 +107,23 @@ export const EventProvider = ({ children }) => {
     });
   };
 
-  const saveEventsToLocalStorage = (updatedEvents) => {
-    localStorage.setItem('events', JSON.stringify(updatedEvents));
-};
+  const addFeedbackToEvent = (eventId, feedback) => {
+    setEvents((prevEvents) => {
+      const updatedEvents = prevEvents.map(event => {
+        if (event.id === eventId) {
+          console.log('Adding feedback to event:', event);
+          return {
+            ...event,
+            feedback: [...(event.feedback || []), feedback],
+          };
+        }
+        return event;
+      });
 
-const addFeedbackToEvent = (eventId, feedback) => {
-  setEvents((prevEvents) => {
-    const updatedEvents = prevEvents.map(event => {
-      if (event.id === eventId) {
-        console.log('Adding feedback to event:', event);
-        return {
-          ...event,
-          feedback: [...(event.feedback || []), feedback],
-        };
-      }
-      return event;
+      console.log('Updated events after adding feedback:', updatedEvents);
+      return updatedEvents;
     });
-
-    saveEventsToLocalStorage(updatedEvents);
-    console.log('Updated events after adding feedback:', updatedEvents);
-    return updatedEvents;
-  });
-};
-
+  };
 
   const getTotalRegistrationsForUserEvents = () => {
     if (!user) return 0;
@@ -124,6 +141,7 @@ const addFeedbackToEvent = (eventId, feedback) => {
       value={{
         events,
         addEvent,
+        setEvents,
         editEvent,
         deleteEvent,
         signUpForEvent,

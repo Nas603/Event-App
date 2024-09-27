@@ -6,21 +6,43 @@ import SearchBar from '../components/SearchBar';
 import '../assets/styles/EventsPage.css';
 
 const EventsPage = () => {
-  const { events } = useContext(EventContext);
+  const { events, setEvents } = useContext(EventContext);
   const [searchTerm, setSearchTerm] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState({ date: '', location: '' });
   const navigate = useNavigate();
-
+  
   const eventsPerPage = 6;
 
-  const filteredEvents = events
-    .filter(event =>
-      event.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (filters.date ? event.date === filters.date : true) &&
-      (filters.location ? event.location.toLowerCase().includes(filters.location.toLowerCase()) : true)
-    );
+  const isEventInPast = (eventDate) => {
+    const today = new Date();
+    const eventDateObj = new Date(eventDate);
+  
+    today.setHours(0, 0, 0, 0);
+    eventDateObj.setHours(0, 0, 0, 0);
+  
+    return eventDateObj < today;
+  };  
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const filteredEvents = events.filter((event) => {
+      const eventDate = new Date(event.date);
+      const [hours, minutes] = event.endTime.split(':');
+      const eventEndDateTime = new Date(eventDate);
+      eventEndDateTime.setHours(hours, minutes);
+
+      return eventEndDateTime >= new Date();
+  });
+
+  useEffect(() => {
+    const upcomingEvents = events.filter(event => !isEventInPast(event.date));
+    if (upcomingEvents.length !== events.length) {
+      setEvents(upcomingEvents);
+    }
+  }, [events, setEvents]);
 
   const totalPages = Math.ceil(filteredEvents.length / eventsPerPage);
   const currentEvents = filteredEvents.slice(
@@ -60,17 +82,26 @@ const EventsPage = () => {
 
       <div className="event-list">
         {currentEvents.length > 0 ? (
-          currentEvents.map(event => (
-            <div key={event.id} className="event-card">
-              <h2>{event.title}</h2>
-              <p><strong>Date:</strong> {event.date}</p>
-              <p><strong>Location:</strong> {event.location}</p>
-              <p className="event-description">{event.description}</p>
-              <button className="view-details-btn" onClick={() => handleViewDetails(event.id)}>
-                View Details
-              </button>
-            </div>
-          ))
+          currentEvents.map(event => {
+            const eventDate = new Date(event.date);
+            const formattedDate = eventDate.toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            });
+
+            return (
+              <div key={event.id} className="event-card">
+                <h2>{event.title}</h2>
+                <p><strong>Date:</strong> {formattedDate}</p>
+                <p><strong>Location:</strong> {event.location}</p>
+                <p className="event-description">{event.description}</p>
+                <button className="view-details-btn" onClick={() => handleViewDetails(event.id)}>
+                  View Details
+                </button>
+              </div>
+            );
+          })
         ) : (
           <p className="no-events-message">No events found.</p>
         )}

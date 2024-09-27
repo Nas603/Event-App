@@ -26,37 +26,41 @@ const CreateEventPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-  
+
     const selectedDateString = event.date;
     const [year, month, day] = selectedDateString.split('-');
     const selectedDate = new Date(year, month - 1, day);
-  
+
     const currentDate = new Date();
     currentDate.setHours(0, 0, 0, 0);
-  
+
     console.log("Selected Date (parsed):", selectedDate.toDateString());
     console.log("Current Date (parsed):", currentDate.toDateString());
-  
-    if (selectedDate < currentDate) {
-      showAlert('The event date cannot be in the past. Please select a valid date.', 'red');
-      return;
-    }
-  
-    addEvent({ ...event, id: Date.now() });
-    showAlert('Event created successfully', 'green');
-  
-    setEvent({
-      title: '',
-      date: '',
-      startTime: '',
-      endTime: '',
-      location: '',
-      description: '',
-    });
-  };
-  
-  
 
+    if (selectedDate < currentDate) {
+        showAlert('The event date cannot be in the past. Please select a valid date.', 'red');
+        return;
+    }
+
+    const eventWithISODate = {
+        ...event,
+        date: selectedDate.toISOString(),
+        id: Date.now(),
+    };
+
+    addEvent(eventWithISODate);
+    showAlert('Event created successfully', 'green');
+
+    setEvent({
+        title: '',
+        date: '',
+        startTime: '',
+        endTime: '',
+        location: '',
+        description: '',
+    });
+};
+  
   const showAlert = (message, color) => {
     setNotification(message);
     setAlertColor(color);

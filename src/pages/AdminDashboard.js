@@ -6,6 +6,7 @@ import '../assets/styles/AdminDashboard.css';
 
 const AdminDashboard = () => {
   const { events = [] } = useContext(EventContext);
+  console.log('AdminDashboard received events:', events);
   const { user } = useAuth0();
   const [upcomingEvents] = useState(0);
   const [totalRegistrations] = useState(0);
