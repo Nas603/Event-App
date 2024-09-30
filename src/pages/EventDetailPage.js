@@ -51,10 +51,19 @@ const EventDetailPage = () => {
     return `${formattedHours}:${minutes} ${period}`;
   };
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
+
   return (
     <div className="event-detail-container">
       <h1>{event.title}</h1>
-      <p><strong>Date:</strong> {event.date}</p>
+      <p><strong>Date:</strong> {formatDate(event.date)}</p>
       <p><strong>Time:</strong> {formatTime(event.startTime)} - {formatTime(event.endTime)}</p>
       <p><strong>Location:</strong> {event.location}</p>
       <p><strong>Description:</strong> {event.description}</p>

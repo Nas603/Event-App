@@ -6,24 +6,26 @@ import '../assets/styles/AdminDashboard.css';
 
 const AdminDashboard = () => {
   const { events = [] } = useContext(EventContext);
-  console.log('AdminDashboard received events:', events);
   const { user } = useAuth0();
-  const [upcomingEvents] = useState(0);
-  const [totalRegistrations] = useState(0);
+  const [upcomingEvents, setUpcomingEvents] = useState(0);
+  const [totalRegistrations, setTotalRegistrations] = useState(0);
   const [recentFeedback, setRecentFeedback] = useState([]);
 
   useEffect(() => {
     if (!events || !user) return;
-  
+
+    const currentDate = new Date();
     const userId = user.sub;
+
     const userEvents = events.filter(userEvent => userEvent.userId === userId);
-  
-    console.log('Loaded Events:', events);
-    console.log('User Events:', userEvents);
-  
+    
+    const upcomingEventCount = userEvents.filter(userEvent => new Date(userEvent.date) >= currentDate).length;
+    setUpcomingEvents(upcomingEventCount);
+    
+    const totalRegs = userEvents.reduce((acc, userEvent) => acc + (userEvent.signedUpUsers?.length || 0), 0);
+    setTotalRegistrations(totalRegs);
+
     const feedbackList = userEvents.reduce((acc, userEvent) => {
-      console.log('User Event:', JSON.stringify(userEvent, null, 2));
-  
       if (userEvent.feedback && userEvent.feedback.length > 0) {
         const feedbackWithEventDetails = userEvent.feedback.map(feedback => ({
           ...feedback,
@@ -33,11 +35,11 @@ const AdminDashboard = () => {
       }
       return acc;
     }, []);
-  
+
     setRecentFeedback(feedbackList.slice(-3).map(feedback => (
       `Event: ${feedback.eventName}, Rating: ${feedback.rating}, Comments: ${feedback.comments}`
     )));
-  }, [events, user]);     
+  }, [events, user]);
 
   return (
     <div className="admin-dashboard-container">

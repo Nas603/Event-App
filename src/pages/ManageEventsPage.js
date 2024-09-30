@@ -6,7 +6,15 @@ import '../assets/styles/ManageEventsPage.css';
 const ManageEventsPage = () => {
   const { events, editEvent, deleteEvent } = useContext(EventContext);
   const [editingEvent, setEditingEvent] = useState(null);
-  const { user } = useAuth0();
+  const { user, isLoading, isAuthenticated } = useAuth0();
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!isAuthenticated || !user) {
+    return <div>You must be logged in to manage your events.</div>;
+  }
 
   const userEvents = events.filter(event => event.userId === user.sub);
 
@@ -15,9 +23,10 @@ const ManageEventsPage = () => {
   };
 
   const handleSaveEdit = () => {
-    editEvent(editingEvent);
+    console.log('Saving Date:', editingEvent.date);
+    editEvent({ ...editingEvent });
     setEditingEvent(null);
-  };
+};
 
   const handleCancelEdit = () => {
     setEditingEvent(null);
@@ -33,6 +42,15 @@ const ManageEventsPage = () => {
     const formattedHours = hours % 12 || 12;
     return `${formattedHours}:${minutes} ${period}`;
   };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+    });
+}; 
 
   return (
     <div className="manage-events-container">
@@ -63,9 +81,11 @@ const ManageEventsPage = () => {
                       type="date"
                       id="date"
                       value={editingEvent.date}
-                      onChange={(e) =>
-                        setEditingEvent({ ...editingEvent, date: e.target.value })
-                      }
+                      onChange={(e) => {
+                      const newDate = e.target.value;
+                      console.log('Updated date:', newDate); // Log the new date here
+                      setEditingEvent({ ...editingEvent, date: newDate });
+                      }}
                     />
                   </div>
                   <div className="form-group">
@@ -123,7 +143,7 @@ const ManageEventsPage = () => {
               ) : (
                 <div>
                   <h3>{event.title}</h3>
-                  <p>Date: {event.date}</p>
+                  <p>Date: {formatDate(event.date)}</p>
                   <p>Start Time: {formatTime(event.startTime)}</p>
                   <p>End Time: {formatTime(event.endTime)}</p>
                   <p>Location: {event.location}</p>

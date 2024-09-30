@@ -10,11 +10,10 @@ export const EventProvider = ({ children }) => {
   useEffect(() => {
     const storedEvents = localStorage.getItem('events');
     if (storedEvents) {
-      const parsedEvents = JSON.parse(storedEvents);
-      setEvents(parsedEvents);
-      console.log('Loaded events from localStorage:', parsedEvents);
+        const parsedEvents = JSON.parse(storedEvents);
+        setEvents(parsedEvents);
     }
-  }, []);
+}, []);
 
   useEffect(() => {
     if (events.length > 0) {
@@ -64,7 +63,8 @@ export const EventProvider = ({ children }) => {
     setEvents((prevEvents) =>
       prevEvents.map((event) => (event.id === updatedEvent.id ? updatedEvent : event))
     );
-  };
+    console.log('Updated events state:', events);
+};
 
   const deleteEvent = (id) => {
     setEvents((prevEvents) => prevEvents.filter((event) => event.id !== id));

@@ -22,6 +22,15 @@ const Profile = () => {
     setSignedUpEvents(prevEvents => prevEvents.filter(event => event.id !== eventId));
   };
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -45,7 +54,7 @@ const Profile = () => {
               const isEventPassed = new Date(event.date) < new Date();  // Check if the event has passed
               return (
                 <li key={event.id} className="event-item">
-                  <span>{event.title} - {event.date}</span>
+                  <span>{event.title} - {formatDate(event.date)}</span> {/* Formatted date */}
                   {isEventPassed ? (
                     <button 
                       onClick={() => navigate(`/review-event/${event.id}`)} 
