@@ -23,10 +23,9 @@ const ManageEventsPage = () => {
   };
 
   const handleSaveEdit = () => {
-    console.log('Saving Date:', editingEvent.date);
     editEvent({ ...editingEvent });
     setEditingEvent(null);
-};
+  };  
 
   const handleCancelEdit = () => {
     setEditingEvent(null);
@@ -44,13 +43,9 @@ const ManageEventsPage = () => {
   };
 
   const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-    });
-}; 
+    const [year, month, day] = dateString.split('-');
+    return `${month}/${day}/${year}`;
+  };  
 
   return (
     <div className="manage-events-container">
@@ -82,34 +77,35 @@ const ManageEventsPage = () => {
                       id="date"
                       value={editingEvent.date}
                       onChange={(e) => {
-                      const newDate = e.target.value;
-                      console.log('Updated date:', newDate); // Log the new date here
-                      setEditingEvent({ ...editingEvent, date: newDate });
+                        const newDate = e.target.value;
+                        setEditingEvent({ ...editingEvent, date: newDate });
                       }}
                     />
                   </div>
                   <div className="form-group">
                     <label htmlFor="startTime">Start Time</label>
                     <input
-                      type="text"
+                      type="time"
                       id="startTime"
-                      placeholder="hh:mm AM/PM"
+                      name="startTime"
                       value={editingEvent.startTime}
                       onChange={(e) =>
                         setEditingEvent({ ...editingEvent, startTime: e.target.value })
                       }
+                      required
                     />
                   </div>
                   <div className="form-group">
                     <label htmlFor="endTime">End Time</label>
                     <input
-                      type="text"
+                      type="time"
                       id="endTime"
-                      placeholder="hh:mm AM/PM"
+                      name="endTime"
                       value={editingEvent.endTime}
                       onChange={(e) =>
                         setEditingEvent({ ...editingEvent, endTime: e.target.value })
                       }
+                      required
                     />
                   </div>
                   <div className="form-group">

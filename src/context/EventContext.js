@@ -13,7 +13,7 @@ export const EventProvider = ({ children }) => {
         const parsedEvents = JSON.parse(storedEvents);
         setEvents(parsedEvents);
     }
-}, []);
+  }, []);
 
   useEffect(() => {
     if (events.length > 0) {
@@ -25,46 +25,51 @@ export const EventProvider = ({ children }) => {
   const removePastEvents = useCallback(() => {
     const now = new Date();
     const filteredEvents = events.filter(event => {
-      const eventEndTime = new Date(`${event.date}T${event.endTime}`);
-      return eventEndTime > now;
+      const eventDate = new Date(event.date);
+      return eventDate >= now;
     });
-  
+
     console.log('Filtered events after past event removal:', filteredEvents);
-  
     if (filteredEvents.length !== events.length) {
       setEvents(filteredEvents);
     }
   }, [events]);  
 
   useEffect(() => {
-  }, [removePastEvents]);
+    removePastEvents();
+  }, [removePastEvents]);  
 
   const addEvent = (newEvent) => {
+    const eventDate = new Date(newEvent.date);
+    const formattedDate = eventDate.toISOString().split('T')[0];
+  
     const eventWithUser = {
       ...newEvent,
+      date: formattedDate,
       id: Math.random().toString(36).substr(2, 9),
       userId: user ? user.sub : null,
       createdBy: user ? user.name || user.email : 'Unknown',
       feedback: [],
       signedUpUsers: [],
     };
-    
-    console.log("Adding event:", eventWithUser);
-    
+  
     setEvents((prevEvents) => {
       const updatedEvents = [...prevEvents, eventWithUser];
-      localStorage.setItem('events', JSON.stringify(updatedEvents));
       console.log("Updated events:", updatedEvents);
       return updatedEvents;
     });
-  };
+  };  
 
   const editEvent = (updatedEvent) => {
-    setEvents((prevEvents) =>
-      prevEvents.map((event) => (event.id === updatedEvent.id ? updatedEvent : event))
-    );
-    console.log('Updated events state:', events);
-};
+    setEvents((prevEvents) => {
+      console.log('Before update:', prevEvents);
+      const updatedEvents = prevEvents.map(event =>
+        event.id === updatedEvent.id ? { ...event, ...updatedEvent } : event
+      );
+      console.log('After update:', updatedEvents);
+      return updatedEvents;
+    });
+  };   
 
   const deleteEvent = (id) => {
     setEvents((prevEvents) => prevEvents.filter((event) => event.id !== id));

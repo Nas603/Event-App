@@ -20,8 +20,8 @@ h2 {
   margin-bottom: 15px;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  overflow: hidden; /* Prevents overflow */
-  transition: all 0.3s ease; /* Smooth transition for expansion */
+  overflow: hidden;
+  transition: all 0.3s ease;
 }
 
 .edit-event-form {
@@ -51,7 +51,10 @@ h2 {
 }
 
 .edit-button,
-.delete-button {
+.delete-button,
+.save-edit-button,
+.cancel-edit-button,
+.create-event-button {
   background-color: #007bff;
   color: #fff;
   border: none;
@@ -63,7 +66,9 @@ h2 {
   transition: background-color 0.3s ease;
 }
 
-.edit-button:hover {
+.edit-button:hover,
+.save-edit-button:hover,
+.create-event-button:hover {
   background-color: #0056b3;
 }
 
@@ -75,26 +80,70 @@ h2 {
   background-color: #c82333;
 }
 
-.save-edit-button,
-.cancel-edit-button {
-  background-color: #000;
-  color: #fff;
-  border: none;
-  padding: 10px 20px;
-  font-size: 16px;
-  cursor: pointer;
-  border-radius: 4px;
-  margin-right: 10px;
-}
-
 .cancel-edit-button {
   background-color: #6c757d;
 }
 
-.save-edit-button:hover {
-  background-color: #333;
-}
-
 .cancel-edit-button:hover {
   background-color: #5a6268;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  color: #333;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.form-group input,
+.form-group textarea {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  color: #333;
+  background-color: #fff;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: #000;
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.notification-container {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #4caf50;
+  color: #fff;
+  padding: 15px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+@media (max-width: 768px) {
+  .create-event-form,
+  .edit-event-form {
+    padding: 20px;
+  }
+  
+  .create-event-button,
+  .save-edit-button,
+  .cancel-edit-button {
+    font-size: 14px;
+  }
 }

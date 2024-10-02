@@ -23,18 +23,23 @@ const EventsPage = () => {
     eventDateObj.setHours(0, 0, 0, 0);
   
     return eventDateObj < today;
+  };
+
+  const formatDate = (dateString) => {
+    const [year, month, day] = dateString.split('-');
+    return `${month}/${day}/${year}`;
   };  
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
   const filteredEvents = events.filter((event) => {
-      const eventDate = new Date(event.date);
-      const [hours, minutes] = event.endTime.split(':');
-      const eventEndDateTime = new Date(eventDate);
-      eventEndDateTime.setHours(hours, minutes);
+    const eventDate = new Date(event.date);
+    const [hours, minutes] = event.endTime.split(':');
+    const eventEndDateTime = new Date(eventDate);
+    eventEndDateTime.setHours(hours, minutes);
 
-      return eventEndDateTime >= new Date();
+    return eventEndDateTime >= new Date();
   });
 
   useEffect(() => {
@@ -83,12 +88,7 @@ const EventsPage = () => {
       <div className="event-list">
         {currentEvents.length > 0 ? (
           currentEvents.map(event => {
-            const eventDate = new Date(event.date);
-            const formattedDate = eventDate.toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            });
+            const formattedDate = formatDate(event.date);
 
             return (
               <div key={event.id} className="event-card">
