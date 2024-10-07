@@ -46,6 +46,14 @@ h2 {
   text-overflow: ellipsis;
 }
 
+.event-image {
+  width: 300px;
+  height: 150px;
+  border-radius: 8px;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
 .event-actions {
   margin-top: 10px;
 }

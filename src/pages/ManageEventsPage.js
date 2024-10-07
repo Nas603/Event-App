@@ -17,6 +17,7 @@ const ManageEventsPage = () => {
   }
 
   const userEvents = events.filter(event => event.userId === user.sub);
+  console.log('User Events:', userEvents);
 
   const handleEditClick = (event) => {
     setEditingEvent({ ...event });
@@ -25,7 +26,7 @@ const ManageEventsPage = () => {
   const handleSaveEdit = () => {
     editEvent({ ...editingEvent });
     setEditingEvent(null);
-  };  
+  };
 
   const handleCancelEdit = () => {
     setEditingEvent(null);
@@ -43,9 +44,14 @@ const ManageEventsPage = () => {
   };
 
   const formatDate = (dateString) => {
-    const [year, month, day] = dateString.split('-');
-    return `${month}/${day}/${year}`;
-  };  
+    const date = new Date(dateString);
+    const adjustedDate = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+    return adjustedDate.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
 
   return (
     <div className="manage-events-container">
@@ -129,6 +135,30 @@ const ManageEventsPage = () => {
                       }
                     />
                   </div>
+                  <div className="form-group image-upload-group">
+                    <label htmlFor="edit-image">Event Image</label>
+                    <input
+                      type="file"
+                      id="edit-image"
+                      name="image"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onloadend = () => {
+                            setEditingEvent({ ...editingEvent, image: reader.result });
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                    />
+                    {editingEvent.image && (
+                      <div className="image-preview">
+                        <img src={editingEvent.image} alt="Event Preview" />
+                      </div>
+                    )}
+                  </div>
                   <button className="save-edit-button" onClick={handleSaveEdit}>
                     Save Changes
                   </button>
@@ -137,12 +167,15 @@ const ManageEventsPage = () => {
                   </button>
                 </div>
               ) : (
-                <div>
+                <div className="event-details">
+                  {event.image && (
+                    <img src={event.image} alt={event.title} className="event-image" />
+                  )}
                   <h3>{event.title}</h3>
-                  <p>Date: {formatDate(event.date)}</p>
-                  <p>Start Time: {formatTime(event.startTime)}</p>
-                  <p>End Time: {formatTime(event.endTime)}</p>
-                  <p>Location: {event.location}</p>
+                  <p><strong>Date:</strong> {formatDate(event.date)}</p>
+                  <p><strong>Start Time:</strong> {formatTime(event.startTime)}</p>
+                  <p><strong>End Time:</strong> {formatTime(event.endTime)}</p>
+                  <p><strong>Location:</strong> {event.location}</p>
                   <p>{event.description}</p>
                   <div className="event-actions">
                     <button className="edit-button" onClick={() => handleEditClick(event)}>
