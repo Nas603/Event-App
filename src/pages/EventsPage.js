@@ -86,26 +86,33 @@ const EventsPage = () => {
       </div>
 
       <div className="event-list">
-        {currentEvents.length > 0 ? (
-          currentEvents.map(event => {
-            const formattedDate = formatDate(event.date);
+  {currentEvents.length > 0 ? (
+    currentEvents.map(event => {
+      const formattedDate = formatDate(event.date);
 
-            return (
-              <div key={event.id} className="event-card">
-                <h2>{event.title}</h2>
-                <p><strong>Date:</strong> {formattedDate}</p>
-                <p><strong>Location:</strong> {event.location}</p>
-                <p className="event-description">{event.description}</p>
-                <button className="view-details-btn" onClick={() => handleViewDetails(event.id)}>
-                  View Details
-                </button>
-              </div>
-            );
-          })
-        ) : (
-          <p className="no-events-message">No events found.</p>
-        )}
-      </div>
+      return (
+        <div key={event.id} className="event-card">
+          {event.image && (
+            <img 
+              src={event.image} 
+              alt={`${event.title} event`} 
+              className="event-image" 
+            />
+          )}
+          <h2>{event.title}</h2>
+          <p><strong>Date:</strong> {formattedDate}</p>
+          <p><strong>Location:</strong> {event.location}</p>
+          <p className="event-description">{event.description}</p>
+          <button className="view-details-btn" onClick={() => handleViewDetails(event.id)}>
+            View Details
+          </button>
+        </div>
+      );
+    })
+  ) : (
+    <p className="no-events-message">No events found.</p>
+  )}
+</div>
 
       <div className="pagination-controls">
         <button
