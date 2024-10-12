@@ -54,11 +54,21 @@ const EventDetailPage = () => {
   const formatDate = (dateString) => {
     const [year, month, day] = dateString.split('-');
     return `${month}/${day}/${year}`;
-  };  
+  };
 
   return (
     <div className="event-detail-container">
       <h1>{event.title}</h1>
+      
+      {/* Add the image here */}
+      {event.image && (
+        <img 
+          src={event.image} 
+          alt={event.title} 
+          className="event-detail-image"
+        />
+      )}
+
       <p><strong>Date:</strong> {formatDate(event.date)}</p>
       <p><strong>Time:</strong> {formatTime(event.startTime)} - {formatTime(event.endTime)}</p>
       <p><strong>Location:</strong> {event.location}</p>
