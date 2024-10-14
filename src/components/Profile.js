@@ -2,13 +2,14 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { EventContext } from '../context/EventContext';
 import '../assets/styles/Profile.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const Profile = () => {
   const { user, isLoading, isAuthenticated, logout } = useAuth0();
   const { events, unregisterFromEvent } = useContext(EventContext);
   const [signedUpEvents, setSignedUpEvents] = useState([]);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (isAuthenticated && user) {
@@ -25,7 +26,7 @@ const Profile = () => {
   const formatDate = (dateString) => {
     const [year, month, day] = dateString.split('-');
     return `${month}/${day}/${year}`;
-  }; 
+  };
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -35,6 +36,14 @@ const Profile = () => {
     return <div>Please log in to view your profile.</div>;
   }
 
+  let upcomingEvents = signedUpEvents;
+  let pastEvents = [];
+
+  if (location.pathname === '/profile') {
+    upcomingEvents = signedUpEvents.filter(event => new Date(event.date) >= new Date());
+    pastEvents = signedUpEvents.filter(event => new Date(event.date) < new Date());
+  }
+
   return (
     <div className="profile-container">
       <h1 className="profile-title">Profile</h1>
@@ -42,36 +51,49 @@ const Profile = () => {
         <h2>Name: {user.name}</h2>
         <p>Email: {user.email}</p>
       </div>
+
       <div className="signed-up-events">
-        <h3 className="events-title">Signed Up Events:</h3>
-        {signedUpEvents.length > 0 ? (
+        <h3 className="events-title">Upcoming Events:</h3>
+        {upcomingEvents.length > 0 ? (
           <ul className="events-list">
-            {signedUpEvents.map(event => {
-              const isEventPassed = new Date(event.date) < new Date();  // Check if the event has passed
-              return (
-                <li key={event.id} className="event-item">
-                  <span>{event.title} - {formatDate(event.date)}</span> {/* Formatted date */}
-                  {isEventPassed ? (
-                    <button 
-                      onClick={() => navigate(`/review-event/${event.id}`)} 
-                      className="rate-event-button">
-                      Rate Event
-                    </button>
-                  ) : (
-                    <button 
-                      onClick={() => handleUnregister(event.id)} 
-                      className="unregister-button">
-                      Unregister
-                    </button>
-                  )}
-                </li>
-              );
-            })}
+            {upcomingEvents.map(event => (
+              <li key={event.id} className="event-item">
+                <span>{event.title} - {formatDate(event.date)}</span>
+                <button 
+                  onClick={() => handleUnregister(event.id)} 
+                  className="unregister-button">
+                  Unregister
+                </button>
+              </li>
+            ))}
           </ul>
         ) : (
-          <p>You have not signed up for any events.</p>
+          <p>You have no upcoming events.</p>
         )}
       </div>
+
+      {location.pathname === '/profile' && (
+        <div className="signed-up-events">
+          <h3 className="events-title">Past Events:</h3>
+          {pastEvents.length > 0 ? (
+            <ul className="events-list">
+              {pastEvents.map(event => (
+                <li key={event.id} className="event-item">
+                  <span>{event.title} - {formatDate(event.date)}</span>
+                  <button 
+                    onClick={() => navigate(`/review-event/${event.id}`)} 
+                    className="rate-event-button">
+                    Rate Event
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>You have no past events.</p>
+          )}
+        </div>
+      )}
+
       <div className="buttons-container">
         <button 
           onClick={() => navigate('/admin/dashboard')} 
