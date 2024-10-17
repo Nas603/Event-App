@@ -23,19 +23,31 @@ const CreateEventPage = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const selectedDate = new Date(event.date);
-        const currentDate = new Date();
-        currentDate.setHours(0, 0, 0, 0);
-
+    
+        // Combine date and start time into a local Date object
+        const selectedDate = new Date(`${event.date}T${event.startTime}`); // Local time
+        const endDate = new Date(`${event.date}T${event.endTime}`); // Local time
+        const currentDate = new Date(); // Local time
+    
+        console.log("Selected Date (Local):", selectedDate);
+        console.log("End Date (Local):", endDate);
+        console.log("Current Date (Local):", currentDate);
+    
         if (selectedDate < currentDate) {
             showAlert('The event date cannot be in the past. Please select a valid date.', 'red');
             return;
         }
-
+    
+        if (endDate <= selectedDate) {
+            showAlert('The end time must be after the start time.', 'red');
+            return;
+        }
+    
         const eventWithImage = { ...event, id: Date.now() };
         addEvent(eventWithImage);
         showAlert('Event created successfully', 'green');
-
+    
+        // Reset the form
         setEvent({
             title: '',
             date: '',
@@ -46,7 +58,7 @@ const CreateEventPage = () => {
             image: '',
         });
         setImagePreview(null);
-    };
+    };       
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;

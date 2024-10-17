@@ -6,51 +6,47 @@ import SearchBar from '../components/SearchBar';
 import '../assets/styles/EventsPage.css';
 
 const EventsPage = () => {
-  const { events, setEvents } = useContext(EventContext);
+  const { events } = useContext(EventContext);
+  console.log('Events from context:', events);
   const [searchTerm, setSearchTerm] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState({ date: '', location: '' });
   const navigate = useNavigate();
-  
+
   const eventsPerPage = 6;
 
-  const isEventInPast = (eventDate) => {
-    const today = new Date();
-    const eventDateObj = new Date(eventDate);
+  const isEventInPast = (eventDateStr, endTimeStr) => {
+    const now = new Date();
+    const eventEndDateTime = new Date(`${eventDateStr}T${endTimeStr}:00`);
+    console.log('Now:', now.toString());
+    console.log('Event End Date Time:', eventEndDateTime.toString());
   
-    today.setHours(0, 0, 0, 0);
-    eventDateObj.setHours(0, 0, 0, 0);
-  
-    return eventDateObj < today;
-  };
+    return eventEndDateTime < now;
+  };  
 
   const formatDate = (dateString) => {
     const [year, month, day] = dateString.split('-');
     return `${month}/${day}/${year}`;
-  };  
+  };
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const filteredEvents = events.filter((event) => {
+  const upcomingEvents = events.filter(event => {
     const eventDate = new Date(event.date);
-    const [hours, minutes] = event.endTime.split(':');
-    const eventEndDateTime = new Date(eventDate);
-    eventEndDateTime.setHours(hours, minutes);
-
-    return eventEndDateTime >= new Date();
+    const isPast = isEventInPast(eventDate, event.endTime);
+    console.log('Event:', event, 'Is Past:', isPast);
+    return !isPast;
   });
+  console.log('Upcoming Events:', upcomingEvents);  
 
-  useEffect(() => {
-    const upcomingEvents = events.filter(event => !isEventInPast(event.date));
-    if (upcomingEvents.length !== events.length) {
-      setEvents(upcomingEvents);
-    }
-  }, [events, setEvents]);
+  const searchFilteredEvents = upcomingEvents.filter(event => 
+    event.title.toLowerCase().includes(searchTerm.toLowerCase())
+  ).filter(event => 
+    (filters.date ? event.date === filters.date : true) &&
+    (filters.location ? event.location.toLowerCase().includes(filters.location.toLowerCase()) : true)
+  );
 
-  const totalPages = Math.ceil(filteredEvents.length / eventsPerPage);
-  const currentEvents = filteredEvents.slice(
+  const totalPages = Math.ceil(searchFilteredEvents.length / eventsPerPage);
+  const currentEvents = searchFilteredEvents.slice(
     (currentPage - 1) * eventsPerPage,
     currentPage * eventsPerPage
   );
@@ -65,7 +61,11 @@ const EventsPage = () => {
   };
 
   useEffect(() => {
-    setCurrentPage(1);
+    const delayDebounceFn = setTimeout(() => {
+      setCurrentPage(1);
+    }, 300);
+
+    return () => clearTimeout(delayDebounceFn);
   }, [searchTerm, showFilters, filters]);
 
   const handleViewDetails = (eventId) => {
@@ -86,33 +86,33 @@ const EventsPage = () => {
       </div>
 
       <div className="event-list">
-  {currentEvents.length > 0 ? (
-    currentEvents.map(event => {
-      const formattedDate = formatDate(event.date);
+        {currentEvents.length > 0 ? (
+          currentEvents.map(event => {
+            const formattedDate = formatDate(event.date);
 
-      return (
-        <div key={event.id} className="event-card">
-          {event.image && (
-            <img 
-              src={event.image} 
-              alt={`${event.title} event`} 
-              className="event-image" 
-            />
-          )}
-          <h2>{event.title}</h2>
-          <p><strong>Date:</strong> {formattedDate}</p>
-          <p><strong>Location:</strong> {event.location}</p>
-          <p className="event-description">{event.description}</p>
-          <button className="view-details-btn" onClick={() => handleViewDetails(event.id)}>
-            View Details
-          </button>
-        </div>
-      );
-    })
-  ) : (
-    <p className="no-events-message">No events found.</p>
-  )}
-</div>
+            return (
+              <div key={event.id} className="event-card">
+                {event.image && (
+                  <img 
+                    src={event.image} 
+                    alt={`${event.title} event`} 
+                    className="event-image" 
+                  />
+                )}
+                <h2>{event.title}</h2>
+                <p><strong>Date:</strong> {formattedDate}</p>
+                <p><strong>Location:</strong> {event.location}</p>
+                <p className="event-description">{event.description}</p>
+                <button className="view-details-btn" onClick={() => handleViewDetails(event.id)}>
+                  View Details
+                </button>
+              </div>
+            );
+          })
+        ) : (
+          <p className="no-events-message">No events found.</p>
+        )}
+      </div>
 
       <div className="pagination-controls">
         <button

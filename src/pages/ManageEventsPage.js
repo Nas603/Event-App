@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { EventContext } from '../context/EventContext';
 import { useAuth0 } from '@auth0/auth0-react';
 import '../assets/styles/ManageEventsPage.css';
@@ -7,6 +7,11 @@ const ManageEventsPage = () => {
   const { events, editEvent, deleteEvent } = useContext(EventContext);
   const [editingEvent, setEditingEvent] = useState(null);
   const { user, isLoading, isAuthenticated } = useAuth0();
+
+  useEffect(() => {
+    console.log('User object:', user);
+    console.log('All Events:', events);
+  }, [user, events]);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -20,19 +25,23 @@ const ManageEventsPage = () => {
   console.log('User Events:', userEvents);
 
   const handleEditClick = (event) => {
+    console.log('Editing event:', event);
     setEditingEvent({ ...event });
   };
 
   const handleSaveEdit = () => {
+    console.log('Saving edited event:', editingEvent);
     editEvent({ ...editingEvent });
     setEditingEvent(null);
   };
 
   const handleCancelEdit = () => {
+    console.log('Cancelling edit for event:', editingEvent);
     setEditingEvent(null);
   };
 
   const handleDeleteClick = (id) => {
+    console.log(`Delete button clicked for event with id: ${id}`);
     deleteEvent(id);
   };
 
