@@ -6,7 +6,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 
 const Profile = () => {
   const { user, isLoading, isAuthenticated, logout } = useAuth0();
-  const { events, unregisterFromEvent } = useContext(EventContext);
+  const { events, pastEvents, unregisterFromEvent } = useContext(EventContext);  // Include pastEvents from context
   const [signedUpEvents, setSignedUpEvents] = useState([]);
   const navigate = useNavigate();
   const location = useLocation();
@@ -28,20 +28,17 @@ const Profile = () => {
     return `${month}/${day}/${year}`;
   };
 
+  const isPastEvent = (event) => {
+    const [year, month, day] = event.date.split('-').map(Number);
+    const [endHour, endMinute] = event.endTime.split(':').map(Number);
+    const eventEndDateTime = new Date(year, month - 1, day, endHour, endMinute);
+    return eventEndDateTime < new Date();
+  };
+
+  const userPastEvents = pastEvents.filter(event => event.signedUpUsers?.includes(user.sub));
+
   if (isLoading) {
     return <div>Loading...</div>;
-  }
-
-  if (!user) {
-    return <div>Please log in to view your profile.</div>;
-  }
-
-  let upcomingEvents = signedUpEvents;
-  let pastEvents = [];
-
-  if (location.pathname === '/profile') {
-    upcomingEvents = signedUpEvents.filter(event => new Date(event.date) >= new Date());
-    pastEvents = signedUpEvents.filter(event => new Date(event.date) < new Date());
   }
 
   return (
@@ -54,17 +51,19 @@ const Profile = () => {
 
       <div className="signed-up-events">
         <h3 className="events-title">Upcoming Events:</h3>
-        {upcomingEvents.length > 0 ? (
+        {signedUpEvents.length > 0 ? (
           <ul className="events-list">
-            {upcomingEvents.map(event => (
-              <li key={event.id} className="event-item">
-                <span>{event.title} - {formatDate(event.date)}</span>
-                <button 
-                  onClick={() => handleUnregister(event.id)} 
-                  className="unregister-button">
-                  Unregister
-                </button>
-              </li>
+            {signedUpEvents.map(event => (
+              !isPastEvent(event) && ( 
+                <li key={event.id} className="event-item">
+                  <span>{event.title} - {formatDate(event.date)}</span>
+                  <button 
+                    onClick={() => handleUnregister(event.id)} 
+                    className="unregister-button">
+                    Unregister
+                  </button>
+                </li>
+              )
             ))}
           </ul>
         ) : (
@@ -75,9 +74,9 @@ const Profile = () => {
       {location.pathname === '/profile' && (
         <div className="signed-up-events">
           <h3 className="events-title">Past Events:</h3>
-          {pastEvents.length > 0 ? (
+          {userPastEvents.length > 0 ? (
             <ul className="events-list">
-              {pastEvents.map(event => (
+              {userPastEvents.map(event => (
                 <li key={event.id} className="event-item">
                   <span>{event.title} - {formatDate(event.date)}</span>
                   <button 

@@ -5,6 +5,7 @@ export const EventContext = createContext();
 
 export const EventProvider = ({ children }) => {
   const [events, setEvents] = useState([]);
+  const [pastEvents, setPastEvents] = useState([]);
   const { user, isLoading } = useAuth0();
 
   useEffect(() => {
@@ -15,8 +16,11 @@ export const EventProvider = ({ children }) => {
           const parsedEvents = JSON.parse(storedEvents);
           
           if (Array.isArray(parsedEvents)) {
-            console.log('Parsed events from localStorage:', parsedEvents);
-            setEvents(parsedEvents);
+            const uniqueEvents = parsedEvents.filter((event, index, self) =>
+              index === self.findIndex((e) => e.id === event.id)
+            );
+            console.log('Parsed events from localStorage:', uniqueEvents);
+            setEvents(uniqueEvents);
           } else {
             console.log('Parsed events are not an array or are empty.');
           }
@@ -27,73 +31,47 @@ export const EventProvider = ({ children }) => {
         console.log('No events found in localStorage.');
       }
     }
-  }, [isLoading]);  
+  }, [isLoading]);    
 
   useEffect(() => {
     if (events.length > 0) {
       localStorage.setItem('events', JSON.stringify(events));
-      console.log('Saved events to localStorage:', events);
     }
-  }, [events]);
+    if (pastEvents.length > 0) {
+      localStorage.setItem('pastEvents', JSON.stringify(pastEvents));
+    }
+  }, [events, pastEvents]);
 
   const removePastEvents = useCallback(() => {
     const now = new Date();
-    console.log('Current Time:', now);
-    console.log('Events before filtering:', events);
-  
-    const filteredEvents = events.filter(event => {
+
+    const upcomingEvents = events.filter(event => {
       const eventEndDateTime = new Date(`${event.date}T${event.endTime}:00`);
-      console.log(`Checking Event: ${event.title}`);
-      console.log(`Event End Time: ${eventEndDateTime.toString()}`);
-      console.log(`Current Time: ${now.toString()}`);
-  
-      return eventEndDateTime >= now;
+      if (eventEndDateTime >= now) {
+        return true;
+      } else {
+        setPastEvents(prev => [...prev, event]);
+        return false;
+      }
     });
-  
-    console.log('Filtered events:', filteredEvents);
-    console.log('Events after filtering:', filteredEvents);
-  
-    if (filteredEvents.length !== events.length) {
-      setEvents(filteredEvents);
-      console.log('Events updated after past event removal.');
-    } else {
-      console.log('No events removed.');
-    }
-  }, [events]);  
+
+    setEvents(upcomingEvents);
+  }, [events]);
 
   useEffect(() => {
     if (!isLoading && events.length > 0) {
-      console.log('Removing past events...');
       removePastEvents();
     }
-  }, [removePastEvents, isLoading, events]);  
+  }, [removePastEvents, isLoading, events]);
 
   const addEvent = (newEvent) => {
-    console.log("Input newEvent:", newEvent);
-  
-    if (!newEvent.date) {
-      console.error('No date provided for the new event');
-      return;
-    }
-  
+    if (!newEvent.date) return;
     const eventStartDate = new Date(`${newEvent.date}T${newEvent.startTime}:00`);
     const eventEndDate = new Date(`${newEvent.date}T${newEvent.endTime}:00`);
-  
-    console.log(`Event Start Date: ${eventStartDate}`);
-    console.log(`Event End Date: ${eventEndDate}`);
-  
+
+    if (eventEndDate <= eventStartDate) return;
     const now = new Date();
-    console.log(`Current Date: ${now}`);
-  
-    if (eventEndDate <= eventStartDate) {
-      console.error('End time must be greater than start time.');
-      return;
-    }
-  
-    if (eventStartDate < now) {
-      console.error('Cannot create event in the past.');
-      return;
-    }
+    if (eventStartDate < now) return;
 
     const eventWithUser = {
       ...newEvent,
@@ -104,115 +82,71 @@ export const EventProvider = ({ children }) => {
       signedUpUsers: [],
     };
 
-    console.log("Event being created with details:", eventWithUser);
+    console.log('Current Events before adding:', events);
 
-    setEvents(prevEvents => {
-      const updatedEvents = [...prevEvents, eventWithUser];
-      console.log("Updated events after creation:", updatedEvents);
-      return updatedEvents;
-    });
+  setEvents(prevEvents => {
+    const updatedEvents = [...prevEvents, eventWithUser];
+    console.log('Updated Events after adding:', updatedEvents);
+    return updatedEvents;
+  });
   };
 
   const editEvent = (updatedEvent) => {
-    console.log('Editing event:', updatedEvent);
-    setEvents(prevEvents => {
-      console.log('Before update:', prevEvents);
-      const updatedEvents = prevEvents.map(event =>
-        event.id === updatedEvent.id ? { ...event, ...updatedEvent } : event
-      );
-      console.log('After update:', updatedEvents);
-      return updatedEvents;
-    });
+    setEvents(prevEvents =>
+      prevEvents.map(event => (event.id === updatedEvent.id ? { ...event, ...updatedEvent } : event))
+    );
   };
 
   const deleteEvent = (id) => {
-    console.log(`Deleting event with id: ${id}`);
     setEvents(prevEvents => prevEvents.filter(event => event.id !== id));
   };
 
   const signUpForEvent = (eventId) => {
-    if (!user) {
-      console.log('User not logged in');
-      return;
-    }
+    if (!user) return;
 
-    console.log(`User ${user.sub} signing up for event ${eventId}`);
-    setEvents(prevEvents => {
-      return prevEvents.map(event => {
+    setEvents(prevEvents =>
+      prevEvents.map(event => {
         if (event.id === eventId) {
-          const isAlreadySignedUp = event.signedUpUsers?.includes(user.sub);
-          if (!isAlreadySignedUp) {
-            return {
-              ...event,
-              signedUpUsers: [...(event.signedUpUsers || []), user.sub],
-            };
+          if (!event.signedUpUsers.includes(user.sub)) {
+            return { ...event, signedUpUsers: [...event.signedUpUsers, user.sub] };
           }
         }
         return event;
-      });
-    });
+      })
+    );
   };
 
   const unregisterFromEvent = (eventId, userId) => {
-    console.log(`User ${userId} unregistering from event ${eventId}`);
-    setEvents(prevEvents => {
-      return prevEvents.map(event => {
-        if (event.id === eventId) {
-          return {
-            ...event,
-            signedUpUsers: event.signedUpUsers?.filter(user => user !== userId),
-          };
-        }
-        return event;
-      });
-    });
+    setEvents(prevEvents =>
+      prevEvents.map(event =>
+        event.id === eventId
+          ? { ...event, signedUpUsers: event.signedUpUsers.filter(user => user !== userId) }
+          : event
+      )
+    );
   };
 
   const addFeedbackToEvent = (eventId, feedback) => {
-    console.log(`Adding feedback to event ${eventId}:`, feedback);
-    setEvents(prevEvents => {
-      const updatedEvents = prevEvents.map(event => {
-        if (event.id === eventId) {
-          console.log('Adding feedback to event:', event);
-          return {
-            ...event,
-            feedback: [...(event.feedback || []), feedback],
-          };
-        }
-        return event;
-      });
-
-      console.log('Updated events after adding feedback:', updatedEvents);
-      return updatedEvents;
-    });
-  };
-
-  const getTotalRegistrationsForUserEvents = () => {
-    if (!user) return 0;
-
-    const total = events.reduce((total, event) => {
-      if (event.userId === user.sub) {
-        return total + (event.signedUpUsers?.length || 0);
-      }
-      return total;
-    }, 0);
-
-    console.log(`Total registrations for user ${user.sub}: ${total}`);
-    return total;
-  };
+    console.log('Events before feedback submission:', events);
+    setEvents(prevEvents => 
+        prevEvents.map(event => 
+            event.id === eventId ? { ...event, feedback: [...event.feedback, feedback] } : event
+        )
+    );
+    console.log('Events after feedback submission:', events);
+};
 
   return (
     <EventContext.Provider
       value={{
         events,
+        pastEvents,
         addEvent,
-        setEvents,
         editEvent,
         deleteEvent,
         signUpForEvent,
         unregisterFromEvent,
         addFeedbackToEvent,
-        getTotalRegistrationsForUserEvents,
       }}
     >
       {children}

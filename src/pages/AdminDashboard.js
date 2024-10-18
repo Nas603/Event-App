@@ -75,9 +75,6 @@ const AdminDashboard = () => {
         <Link to="/admin/manage-events" className="dashboard-link">
           <button className="dashboard-button">Manage Events</button>
         </Link>
-        <Link to="/admin/reports" className="dashboard-link">
-          <button className="dashboard-button">View Reports</button>
-        </Link>
       </div>
     </div>
   );

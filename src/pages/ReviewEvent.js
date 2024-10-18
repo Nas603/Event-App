@@ -5,8 +5,7 @@ import '../assets/styles/ReviewEvent.css';
 
 const ReviewEvent = () => {
     const { id: eventId } = useParams();
-    console.log('Event ID from URL:', eventId);
-    const { addFeedbackToEvent } = useContext(EventContext);
+    const { addFeedbackToEvent, events } = useContext(EventContext);
     const [rating, setRating] = useState('');
     const [comments, setComments] = useState('');
     const [submitted, setSubmitted] = useState(false);
@@ -17,7 +16,7 @@ const ReviewEvent = () => {
         console.log('Submitting feedback:', feedback, 'for eventId:', eventId);
         addFeedbackToEvent(eventId, feedback);
         setSubmitted(true);
-    };
+    };     
 
     return (
         <div className="review-event-container">

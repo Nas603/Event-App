@@ -6,7 +6,6 @@ import EventDetailPage from './pages/EventDetailPage';
 import AdminDashboard from './pages/AdminDashboard';
 import CreateEventPage from './pages/CreateEventPage';
 import ManageEventsPage from './pages/ManageEventsPage';
-import ReportsPage from './pages/ReportsPage';
 import UserProfilePage from './pages/UserProfilePage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
@@ -29,7 +28,6 @@ const App = () => {
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/create-event" element={<CreateEventPage />} />
           <Route path="/admin/manage-events" element={<ManageEventsPage />} />
-          <Route path="/admin/reports" element={<ReportsPage />} />
           <Route path="/profile" element={<UserProfilePage />} />
           <Route path="/review-event/:id" element={<ReviewEvent />} />
           <Route path="/about" element={<AboutPage />} /> 
