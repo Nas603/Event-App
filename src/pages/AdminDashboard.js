@@ -5,24 +5,32 @@ import { useAuth0 } from '@auth0/auth0-react';
 import '../assets/styles/AdminDashboard.css';
 
 const AdminDashboard = () => {
-  const { events = [] } = useContext(EventContext);
+  const { events = [], pastEvents = [] } = useContext(EventContext);
   const { user } = useAuth0();
   const [upcomingEvents, setUpcomingEvents] = useState(0);
   const [totalRegistrations, setTotalRegistrations] = useState(0);
   const [recentFeedback, setRecentFeedback] = useState([]);
 
   useEffect(() => {
-    if (!events || !user) return;
+    console.log('Events in Admin Dashboard:', events);
+    if (!events || !pastEvents || !user) return;
 
-    const currentDate = new Date();
+    const currentDateTime = new Date();
     const userId = user.sub;
 
-    const userEvents = events.filter(userEvent => userEvent.userId === userId);
-    
-    const upcomingEventCount = userEvents.filter(userEvent => new Date(userEvent.date) >= currentDate).length;
+    const userEvents = [...events, ...pastEvents].filter(userEvent => userEvent.userId === userId);
+
+    const isUpcomingEvent = (userEvent) => {
+      const eventEndDateTime = new Date(`${userEvent.date}T${userEvent.endTime}`);
+      return eventEndDateTime >= currentDateTime;
+    };
+
+    const upcomingUserEvents = userEvents.filter(isUpcomingEvent);
+
+    const upcomingEventCount = upcomingUserEvents.length;
     setUpcomingEvents(upcomingEventCount);
-    
-    const totalRegs = userEvents.reduce((acc, userEvent) => acc + (userEvent.signedUpUsers?.length || 0), 0);
+
+    const totalRegs = upcomingUserEvents.reduce((acc, userEvent) => acc + (userEvent.signedUpUsers?.length || 0), 0);
     setTotalRegistrations(totalRegs);
 
     const feedbackList = userEvents.reduce((acc, userEvent) => {
@@ -39,7 +47,7 @@ const AdminDashboard = () => {
     setRecentFeedback(feedbackList.slice(-3).map(feedback => (
       `Event: ${feedback.eventName}, Rating: ${feedback.rating}, Comments: ${feedback.comments}`
     )));
-  }, [events, user]);
+  }, [events, pastEvents, user]);
 
   return (
     <div className="admin-dashboard-container">

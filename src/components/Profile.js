@@ -6,7 +6,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 
 const Profile = () => {
   const { user, isLoading, isAuthenticated, logout } = useAuth0();
-  const { events, pastEvents, unregisterFromEvent } = useContext(EventContext);  // Include pastEvents from context
+  const { events, pastEvents, unregisterFromEvent } = useContext(EventContext);
   const [signedUpEvents, setSignedUpEvents] = useState([]);
   const navigate = useNavigate();
   const location = useLocation();
@@ -19,7 +19,7 @@ const Profile = () => {
   }, [isAuthenticated, user, events]);
 
   const handleUnregister = (eventId) => {
-    unregisterFromEvent(eventId, user.sub);
+    unregisterFromEvent(eventId, user?.sub);
     setSignedUpEvents(prevEvents => prevEvents.filter(event => event.id !== eventId));
   };
 
@@ -35,7 +35,7 @@ const Profile = () => {
     return eventEndDateTime < new Date();
   };
 
-  const userPastEvents = pastEvents.filter(event => event.signedUpUsers?.includes(user.sub));
+  const userPastEvents = user ? pastEvents.filter(event => event.signedUpUsers?.includes(user.sub)) : [];
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -45,8 +45,8 @@ const Profile = () => {
     <div className="profile-container">
       <h1 className="profile-title">Profile</h1>
       <div className="profile-info">
-        <h2>Name: {user.name}</h2>
-        <p>Email: {user.email}</p>
+        <h2>Name: {user?.name}</h2>
+        <p>Email: {user?.email}</p>
       </div>
 
       <div className="signed-up-events">

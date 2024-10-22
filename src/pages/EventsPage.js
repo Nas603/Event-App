@@ -7,7 +7,6 @@ import '../assets/styles/EventsPage.css';
 
 const EventsPage = () => {
   const { events } = useContext(EventContext);
-  console.log('Events from context:', events);
   const [searchTerm, setSearchTerm] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -19,11 +18,8 @@ const EventsPage = () => {
   const isEventInPast = (eventDateStr, endTimeStr) => {
     const now = new Date();
     const eventEndDateTime = new Date(`${eventDateStr}T${endTimeStr}:00`);
-    console.log('Now:', now.toString());
-    console.log('Event End Date Time:', eventEndDateTime.toString());
-  
     return eventEndDateTime < now;
-  };  
+  };
 
   const formatDate = (dateString) => {
     const [year, month, day] = dateString.split('-');
@@ -33,10 +29,8 @@ const EventsPage = () => {
   const upcomingEvents = events.filter(event => {
     const eventDate = new Date(event.date);
     const isPast = isEventInPast(eventDate, event.endTime);
-    console.log('Event:', event, 'Is Past:', isPast);
     return !isPast;
   });
-  console.log('Upcoming Events:', upcomingEvents);  
 
   const searchFilteredEvents = upcomingEvents.filter(event => 
     event.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -92,20 +86,22 @@ const EventsPage = () => {
 
             return (
               <div key={event.id} className="event-card">
-                {event.image && (
-                  <img 
-                    src={event.image} 
-                    alt={`${event.title} event`} 
-                    className="event-image" 
-                  />
-                )}
-                <h2>{event.title}</h2>
-                <p><strong>Date:</strong> {formattedDate}</p>
-                <p><strong>Location:</strong> {event.location}</p>
-                <p className="event-description">{event.description}</p>
-                <button className="view-details-btn" onClick={() => handleViewDetails(event.id)}>
-                  View Details
-                </button>
+                <div className="event-content">
+                  {event.image && (
+                    <img 
+                      src={event.image} 
+                      alt={`${event.title} event`} 
+                      className="event-image" 
+                    />
+                  )}
+                  <h2>{event.title}</h2>
+                  <p><strong>Date:</strong> {formattedDate}</p>
+                  <p><strong>Location:</strong> {event.location}</p>
+                  <p className="event-description">{event.description}</p>
+                  <button className="view-details-btn" onClick={() => handleViewDetails(event.id)}>
+                    View Details
+                  </button>
+                </div>
               </div>
             );
           })

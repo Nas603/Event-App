@@ -5,7 +5,7 @@ import '../assets/styles/ReviewEvent.css';
 
 const ReviewEvent = () => {
     const { id: eventId } = useParams();
-    const { addFeedbackToEvent, events } = useContext(EventContext);
+    const { addFeedbackToEvent } = useContext(EventContext);
     const [rating, setRating] = useState('');
     const [comments, setComments] = useState('');
     const [submitted, setSubmitted] = useState(false);

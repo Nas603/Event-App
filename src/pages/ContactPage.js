@@ -1,12 +1,22 @@
 import React from 'react';
+import '../assets/styles/Contact.css';
 
-const ContactPage = () => {
+const Contact = () => {
   return (
-    <div className="contact-page">
+    <div className="contact-container">
       <h1>Contact Us</h1>
-      <p>Feel free to reach out to us via email or phone.</p>
+      <p>If you have any questions or need assistance, feel free to reach out to us:</p>
+      
+      <h2>Our Information</h2>
+      <ul className="contact-info">
+        <li><strong>Email:</strong> support@example.com</li>
+        <li><strong>Phone:</strong> (123) 456-7890</li>
+        <li><strong>Address:</strong> 123 Event Street, Event City, EC 12345</li>
+      </ul>
+
+      <p>We look forward to hearing from you!</p>
     </div>
   );
 };
 
-export default ContactPage;
+export default Contact;

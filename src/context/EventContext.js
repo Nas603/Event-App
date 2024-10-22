@@ -5,33 +5,44 @@ export const EventContext = createContext();
 
 export const EventProvider = ({ children }) => {
   const [events, setEvents] = useState([]);
-  const [pastEvents, setPastEvents] = useState([]);
+  const [pastEvents, setPastEvents] = useState(() => {
+    const storedPastEvents = localStorage.getItem('pastEvents');
+    return storedPastEvents ? JSON.parse(storedPastEvents) : [];
+  });
   const { user, isLoading } = useAuth0();
+
+  const removePastEvents = useCallback((loadedEvents) => {
+    const now = new Date();
+
+    const upcomingEvents = loadedEvents.filter(event => {
+      const eventEndDateTime = new Date(`${event.date}T${event.endTime}:00`);
+      return eventEndDateTime >= now;
+    });
+
+    setEvents(upcomingEvents);
+
+    const newPastEvents = loadedEvents.filter(event => {
+      const eventEndDateTime = new Date(`${event.date}T${event.endTime}:00`);
+      return eventEndDateTime < now;
+    });
+
+    setPastEvents(prev => {
+      const existingEventIds = new Set(prev.map(event => event.id));
+      const uniqueNewPastEvents = newPastEvents.filter(event => !existingEventIds.has(event.id));
+
+      return [...prev, ...uniqueNewPastEvents];
+    });
+  }, []);
 
   useEffect(() => {
     if (!isLoading) {
       const storedEvents = localStorage.getItem('events');
       if (storedEvents) {
-        try {
-          const parsedEvents = JSON.parse(storedEvents);
-          
-          if (Array.isArray(parsedEvents)) {
-            const uniqueEvents = parsedEvents.filter((event, index, self) =>
-              index === self.findIndex((e) => e.id === event.id)
-            );
-            console.log('Parsed events from localStorage:', uniqueEvents);
-            setEvents(uniqueEvents);
-          } else {
-            console.log('Parsed events are not an array or are empty.');
-          }
-        } catch (error) {
-          console.error('Error parsing events from localStorage:', error);
-        }
-      } else {
-        console.log('No events found in localStorage.');
+        const parsedEvents = JSON.parse(storedEvents);
+        removePastEvents(parsedEvents);
       }
     }
-  }, [isLoading]);    
+  }, [isLoading, removePastEvents]);
 
   useEffect(() => {
     if (events.length > 0) {
@@ -41,28 +52,6 @@ export const EventProvider = ({ children }) => {
       localStorage.setItem('pastEvents', JSON.stringify(pastEvents));
     }
   }, [events, pastEvents]);
-
-  const removePastEvents = useCallback(() => {
-    const now = new Date();
-
-    const upcomingEvents = events.filter(event => {
-      const eventEndDateTime = new Date(`${event.date}T${event.endTime}:00`);
-      if (eventEndDateTime >= now) {
-        return true;
-      } else {
-        setPastEvents(prev => [...prev, event]);
-        return false;
-      }
-    });
-
-    setEvents(upcomingEvents);
-  }, [events]);
-
-  useEffect(() => {
-    if (!isLoading && events.length > 0) {
-      removePastEvents();
-    }
-  }, [removePastEvents, isLoading, events]);
 
   const addEvent = (newEvent) => {
     if (!newEvent.date) return;
@@ -82,13 +71,7 @@ export const EventProvider = ({ children }) => {
       signedUpUsers: [],
     };
 
-    console.log('Current Events before adding:', events);
-
-  setEvents(prevEvents => {
-    const updatedEvents = [...prevEvents, eventWithUser];
-    console.log('Updated Events after adding:', updatedEvents);
-    return updatedEvents;
-  });
+    setEvents(prevEvents => [...prevEvents, eventWithUser]);
   };
 
   const editEvent = (updatedEvent) => {
@@ -127,14 +110,26 @@ export const EventProvider = ({ children }) => {
   };
 
   const addFeedbackToEvent = (eventId, feedback) => {
-    console.log('Events before feedback submission:', events);
-    setEvents(prevEvents => 
-        prevEvents.map(event => 
-            event.id === eventId ? { ...event, feedback: [...event.feedback, feedback] } : event
-        )
-    );
-    console.log('Events after feedback submission:', events);
-};
+    setEvents(prevEvents => {
+      const updatedEvents = prevEvents.map(event => {
+        if (event.id === eventId) {
+          return { ...event, feedback: [...event.feedback, feedback] };
+        }
+        return event;
+      });
+      return updatedEvents;
+    });
+  
+    setPastEvents(prevPastEvents => {
+      const updatedPastEvents = prevPastEvents.map(event => {
+        if (event.id === eventId) {
+          return { ...event, feedback: [...event.feedback, feedback] };
+        }
+        return event;
+      });
+      return updatedPastEvents;
+    });
+  };  
 
   return (
     <EventContext.Provider
