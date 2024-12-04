@@ -60,7 +60,6 @@ const EventDetailPage = () => {
     <div className="event-detail-container">
       <h1>{event.title}</h1>
       
-      {/* Add the image here */}
       {event.image && (
         <img 
           src={event.image} 

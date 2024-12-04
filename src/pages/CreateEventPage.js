@@ -24,10 +24,9 @@ const CreateEventPage = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
     
-        // Combine date and start time into a local Date object
-        const selectedDate = new Date(`${event.date}T${event.startTime}`); // Local time
-        const endDate = new Date(`${event.date}T${event.endTime}`); // Local time
-        const currentDate = new Date(); // Local time
+        const selectedDate = new Date(`${event.date}T${event.startTime}`);
+        const endDate = new Date(`${event.date}T${event.endTime}`);
+        const currentDate = new Date();
     
         console.log("Selected Date (Local):", selectedDate);
         console.log("End Date (Local):", endDate);
@@ -47,7 +46,6 @@ const CreateEventPage = () => {
         addEvent(eventWithImage);
         showAlert('Event created successfully', 'green');
     
-        // Reset the form
         setEvent({
             title: '',
             date: '',

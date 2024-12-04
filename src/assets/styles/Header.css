@@ -21,7 +21,6 @@
   color: inherit;
 }
 
-/* Navigation Menu Styling */
 .nav-menu ul {
   list-style: none;
   display: flex;
@@ -42,8 +41,8 @@
   font-weight: 500;
   padding: 5px 0;
   transition: color 0.3s ease;
-  background: none; /* Remove background for button */
-  border: none; /* Remove border for button */
+  background: none;
+  border: none;
 }
 
 .nav-menu ul li a:hover,
@@ -71,7 +70,6 @@
   width: 100%;
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   .header-container {
     flex-direction: column;
