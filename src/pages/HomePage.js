@@ -6,7 +6,7 @@ const HomePage = () => {
   return (
     <div className="homepage-container">
       <section className="hero">
-        <h1>Welcome to Event Manager</h1>
+        <h1>Welcome to Eventer</h1>
         <p>Plan, manage, and enjoy your events effortlessly.</p>
         <Link to="EventsPage">
         <button className="cta-button">Explore Events</button>
